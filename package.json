@@ -12,9 +12,9 @@
     "lint": "eslint . --ext .ts",
     "test": "vitest run"
   },
-  "dependencies": {},
   "devDependencies": {
-    "typescript": "~6.0.2",
-    "vite": "^8.2.0"
+    "eslint": "^10.8.1",
+    "typescript": "~7.0.2",
+    "vite": "^8.2.1"
   }
 }
