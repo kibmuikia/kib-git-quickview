@@ -1,1 +1,7 @@
-// Entry point for the extension popup UI initialization and state binding
+import { PopupController } from './popup.ts';
+
+document.addEventListener('DOMContentLoaded', () => {
+  const controller = new PopupController();
+  // Expose controller instance for debugging
+  (window as unknown as { popupController: PopupController }).popupController = controller;
+});

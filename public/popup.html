@@ -1,1 +1,274 @@
-<!-- Entry point HTML container for the Chrome extension popup dashboard UI -->
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GitQuickView — Compact Developer Dashboard</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="../src/popup/popup.css" />
+</head>
+<body>
+  <div id="app" class="popup-container">
+    
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+    <!-- Header Navigation -->
+    <header class="popup-header">
+      <div class="brand">
+        <div class="brand-logo" title="GitQuickView Logo">
+          <svg width="22" height="22" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="38" height="38" rx="8" fill="currentColor" class="logo-bg" />
+            <circle cx="19" cy="19" r="14" stroke="var(--color-logo-stroke)" stroke-width="2.5" fill="none"/>
+            <path d="M12 24 C14 18, 24 18, 26 24" stroke="var(--color-logo-stroke)" stroke-width="2" stroke-linecap="round" fill="none"/>
+            <path d="M19 19 L25 12" stroke="var(--color-accent-rust)" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="19" cy="19" r="2.5" fill="var(--color-logo-stroke)"/>
+          </svg>
+        </div>
+        <span class="brand-title">GitQuickView</span>
+      </div>
+
+      <div class="header-controls">
+        <!-- Search Input Bar -->
+        <form id="search-form" class="search-box">
+          <input 
+            type="text" 
+            id="search-input" 
+            placeholder="Search user..." 
+            autocomplete="off" 
+            spellcheck="false" 
+            aria-label="Search GitHub Username"
+          />
+          <button type="submit" class="btn-search" title="Search User">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </form>
+
+        <!-- Theme Toggle Button -->
+        <button id="theme-toggle" class="btn-icon" title="Toggle Theme (Dark / Light / System)">
+          <svg class="icon-dark" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          <svg class="icon-light" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="icon-system" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+          </svg>
+        </button>
+
+        <!-- Options Page Link -->
+        <button id="btn-options" class="btn-icon" title="Settings & Token Configuration">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main View Switcher Container -->
+    <main id="main-content" class="main-content" data-state="loaded">
+
+      <!-- 1. LOADED PROFILE VIEW -->
+      <section id="view-profile" class="view-panel view-loaded">
+        <!-- Profile Card -->
+        <div class="profile-card">
+          <div class="avatar-wrapper">
+            <img id="user-avatar" src="https://avatars.githubusercontent.com/u/583231?v=4" alt="User Avatar" class="avatar-img" />
+            <div class="avatar-badge" title="Developer Active">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="16 18 22 12 16 6"></polyline>
+                <polyline points="8 6 2 12 8 18"></polyline>
+              </svg>
+            </div>
+          </div>
+
+          <h1 id="user-name" class="profile-name">Eleanor Richards</h1>
+          <a id="user-handle" href="https://github.com" target="_blank" rel="noopener" class="profile-handle">@el_richards</a>
+          
+          <p id="user-bio" class="profile-bio">
+            Crafting performant digital experiences. Open source contributor &amp; mechanical keyboard enthusiast.
+          </p>
+        </div>
+
+        <!-- Metrics Stats Grid -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-label">REPOS</span>
+            <span id="stat-repos" class="stat-value">142</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">FOLLOWERS</span>
+            <span id="stat-followers" class="stat-value">8.4k</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">STARS</span>
+            <span id="stat-stars" class="stat-value">12k</span>
+          </div>
+        </div>
+
+        <!-- Recent Activity Feed -->
+        <div class="section-container">
+          <div class="section-header">
+            <h2 class="section-title">RECENT ACTIVITY</h2>
+            <button id="btn-activity-more" class="btn-more" title="Activity Options">
+              <span>•••</span>
+            </button>
+          </div>
+
+          <div id="repo-list" class="repo-list">
+            <!-- Repo Card 1 -->
+            <a href="https://github.com" target="_blank" rel="noopener" class="repo-card">
+              <div class="repo-info">
+                <div class="repo-title-row">
+                  <svg class="repo-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                  </svg>
+                  <span class="repo-name">artisan-ui</span>
+                </div>
+                <span class="repo-meta">Updated 2h ago</span>
+              </div>
+              <span class="language-badge lang-typescript">TypeScript</span>
+            </a>
+
+            <!-- Repo Card 2 -->
+            <a href="https://github.com" target="_blank" rel="noopener" class="repo-card">
+              <div class="repo-info">
+                <div class="repo-title-row">
+                  <svg class="repo-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                  </svg>
+                  <span class="repo-name">mech-kb-firmware</span>
+                </div>
+                <span class="repo-meta">Updated 1d ago</span>
+              </div>
+              <span class="language-badge lang-cpp">C++</span>
+            </a>
+
+            <!-- Repo Card 3 -->
+            <a href="https://github.com" target="_blank" rel="noopener" class="repo-card">
+              <div class="repo-info">
+                <div class="repo-title-row">
+                  <svg class="repo-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                  </svg>
+                  <span class="repo-name">dotfiles</span>
+                </div>
+                <span class="repo-meta">Updated 3d ago</span>
+              </div>
+              <span class="language-badge lang-shell">Shell</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. LOADING STATE VIEW (Skeleton Shimmers) -->
+      <section id="view-loading" class="view-panel view-loading">
+        <div class="profile-card skeleton-card">
+          <div class="skeleton avatar-skeleton"></div>
+          <div class="skeleton text-skeleton title-skeleton"></div>
+          <div class="skeleton text-skeleton handle-skeleton"></div>
+          <div class="skeleton text-skeleton bio-skeleton"></div>
+          <div class="skeleton text-skeleton bio-skeleton-2"></div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card skeleton-stat"><div class="skeleton stat-skeleton-inner"></div></div>
+          <div class="stat-card skeleton-stat"><div class="skeleton stat-skeleton-inner"></div></div>
+          <div class="stat-card skeleton-stat"><div class="skeleton stat-skeleton-inner"></div></div>
+        </div>
+
+        <div class="section-container">
+          <div class="skeleton section-title-skeleton"></div>
+          <div class="repo-list">
+            <div class="skeleton repo-card-skeleton"></div>
+            <div class="skeleton repo-card-skeleton"></div>
+            <div class="skeleton repo-card-skeleton"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. EMPTY STATE VIEW -->
+      <section id="view-empty" class="view-panel view-empty">
+        <div class="empty-box">
+          <div class="empty-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </div>
+          <h3 class="empty-title">Inspect Any GitHub Developer</h3>
+          <p class="empty-text">Enter a GitHub handle above to view public activity, languages, and repo statistics instantly.</p>
+          
+          <div class="quick-chips">
+            <span class="chips-label">Quick Try:</span>
+            <button class="chip-btn" data-username="torvalds">@torvalds</button>
+            <button class="chip-btn" data-username="gaearon">@gaearon</button>
+            <button class="chip-btn" data-username="sindresorhus">@sindresorhus</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. ERROR STATE VIEW -->
+      <section id="view-error" class="view-panel view-error">
+        <div class="error-box">
+          <div class="error-icon">
+            <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          </div>
+          <h3 id="error-title" class="error-title">User Not Found</h3>
+          <p id="error-message" class="error-text">Could not fetch profile for the requested GitHub account. Please check the spelling or rate limit.</p>
+          <button id="btn-retry" class="btn-primary">Try Again</button>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer Controls -->
+    <footer class="popup-footer">
+      <div class="footer-info">
+        <span class="version-tag">GitQuickView v0.0.1</span>
+        <span class="bullet">•</span>
+        <span id="rate-limit-tag" class="rate-limit-tag">Rate Limit: 4950/5000</span>
+      </div>
+
+      <button id="btn-sidepanel" class="btn-sidepanel" title="Open in side panel">
+        <span>Open in side panel</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+          <polyline points="15 3 21 3 21 9"></polyline>
+          <line x1="10" y1="14" x2="21" y2="3"></line>
+        </svg>
+      </button>
+    </footer>
+
+  </div>
+
+  <script type="module" src="../src/popup/index.ts"></script>
+</body>
+</html>
