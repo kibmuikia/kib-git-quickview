@@ -1,26 +1,13 @@
-import { resolve } from "node:path";
 import { defineConfig } from "vite";
+import { crx } from "@crxjs/vite-plugin";
+import manifest from "./src/manifest.config";
 
 export default defineConfig({
+  plugins: [crx({ manifest })],
   build: {
     outDir: "dist",
     emptyOutDir: true,
-    rollupOptions: {
-      input: {
-        popup: resolve(import.meta.dirname, "public/popup.html"),
-        options: resolve(import.meta.dirname, "public/options.html"),
-        background: resolve(import.meta.dirname, "src/background/index.ts"),
-      },
-      output: {
-        entryFileNames: (chunkInfo) => {
-          if (chunkInfo.name === "background") {
-            return "src/background/index.js";
-          }
-          return "assets/[name]-[hash].js";
-        },
-        chunkFileNames: "assets/[name]-[hash].js",
-        assetFileNames: "assets/[name]-[hash].[ext]",
-      },
-    },
+    sourcemap: false,
+    minify: "esbuild",
   },
 });

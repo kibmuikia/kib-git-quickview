@@ -141,6 +141,7 @@ const MOCK_PROFILES: Record<string, DeveloperProfile> = {
   },
 };
 
+// TODO: use messaging system in background/service-worker. no actual op in options.html scope.
 export class PopupController {
   private currentTheme: ThemeMode = "dark";
 
