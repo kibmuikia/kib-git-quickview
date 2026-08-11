@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>kib-git-quickview — logo transformation</title>
+<style>
+  :root {
+    --ivory: #faf5ee;
+    --charcoal: #2a2420;
+    --rust: #b4552f;
+    --saddle: #a9702f;
+  }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+    background: var(--ivory);
+    font-family: -apple-system, 'Segoe UI', Inter, sans-serif;
+    color: var(--charcoal);
+  }
+  h1 {
+    font-family: Georgia, 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: 0.02em;
+  }
+  .stage {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 12px 28px rgba(37,33,29,0.18);
+    padding: 24px;
+  }
+  svg { display: block; cursor: pointer; }
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 14px;
+  }
+  button {
+    font: inherit;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1.5px solid var(--charcoal);
+    background: transparent;
+    color: var(--charcoal);
+    cursor: pointer;
+  }
+  button:hover { background: var(--charcoal); color: var(--ivory); }
+  label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+  .state-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--saddle);
+    min-width: 90px;
+  }
+</style>
+</head>
+<body>
+
+  <h1>kib-git-quickview — dashboard gauge ⇄ K monogram</h1>
+
+  <div class="stage">
+    <svg id="logo" viewBox="0 0 200 200" width="220" height="220">
+      <circle data-part="rim" cx="100" cy="100" r="70" fill="none"
+        stroke="#2a2420" stroke-width="14" stroke-linecap="round" />
+      <line data-part="spoke-left" x1="100" y1="100" x2="100" y2="100"
+        stroke="#2a2420" stroke-width="14" stroke-linecap="round" />
+      <line data-part="spoke-right" x1="100" y1="100" x2="100" y2="100"
+        stroke="#2a2420" stroke-width="14" stroke-linecap="round" />
+      <line data-part="needle" x1="100" y1="100" x2="100" y2="100"
+        stroke="#b4552f" stroke-width="14" stroke-linecap="round" />
+      <circle data-part="dot" cx="100" cy="100" r="13" fill="#b4552f" />
+    </svg>
+  </div>
+
+  <div class="controls">
+    <span class="state-tag" id="stateTag">gauge</span>
+    <button id="toggleBtn">Toggle</button>
+    <label><input type="checkbox" id="autoCycle" /> Auto-cycle</label>
+  </div>
+
+<script>
+// This is the browser-runnable (type-stripped) twin of logo-animator.ts.
+// Logic, constants, and structure match the .ts source 1:1.
+
+const CENTER = 100;
+const RIM_RADIUS = 70;
+const CIRCUMFERENCE = 2 * Math.PI * RIM_RADIUS;
+const DURATION_MS = 650;
+
+function pointOnRay(angleDeg, length) {
+  const rad = (angleDeg * Math.PI) / 180;
+  return {
+    x: CENTER + length * Math.cos(rad),
+    y: CENTER + length * Math.sin(rad),
+  };
+}
+
+function easeInOutCubic(t) {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+function lerp(a, b, t) {
+  return a + (b - a) * t;
+}
+
+const needleGauge = pointOnRay(-55, 45);
+const needleMonogram = pointOnRay(-35, 85);
+const spokeRightGauge = pointOnRay(55, 60);
+const spokeRightMonogram = pointOnRay(35, 85);
+const spokeLeftGauge = pointOnRay(125, 60);
+
+const STATES = {
+  gauge: {
+    rim: { dash: CIRCUMFERENCE, gap: CIRCUMFERENCE, offset: 0, rotate: 0 },
+    needle: { x2: needleGauge.x, y2: needleGauge.y, opacity: 1 },
+    spokeRight: { x2: spokeRightGauge.x, y2: spokeRightGauge.y, opacity: 1 },
+    spokeLeft: { x2: spokeLeftGauge.x, y2: spokeLeftGauge.y, opacity: 1 },
+  },
+  monogram: {
+    rim: { dash: CIRCUMFERENCE * 0.3, gap: CIRCUMFERENCE * 0.7, offset: CIRCUMFERENCE * 0.35, rotate: 6 },
+    needle: { x2: needleMonogram.x, y2: needleMonogram.y, opacity: 1 },
+    spokeRight: { x2: spokeRightMonogram.x, y2: spokeRightMonogram.y, opacity: 1 },
+    spokeLeft: { x2: CENTER, y2: CENTER, opacity: 0 },
+  },
+};
+
+class LogoAnimator {
+  constructor(svg) {
+    this.parts = {
+      rim: svg.querySelector('[data-part="rim"]'),
+      needle: svg.querySelector('[data-part="needle"]'),
+      spokeRight: svg.querySelector('[data-part="spoke-right"]'),
+      spokeLeft: svg.querySelector('[data-part="spoke-left"]'),
+    };
+    this.current = 'gauge';
+    this.frame = null;
+    this.paint(STATES.gauge);
+  }
+
+  get state() { return this.current; }
+
+  toggle() { return this.setState(this.current === 'gauge' ? 'monogram' : 'gauge'); }
+
+  setState(next) {
+    const from = STATES[this.current];
+    const to = STATES[next];
+    this.animate(from, to);
+    this.current = next;
+    return next;
+  }
+
+  animate(from, to) {
+    if (this.frame) cancelAnimationFrame(this.frame);
+    const start = performance.now();
+    const step = (now) => {
+      const t = Math.min(1, (now - start) / DURATION_MS);
+      const e = easeInOutCubic(t);
+      this.paint({
+        rim: {
+          dash: lerp(from.rim.dash, to.rim.dash, e),
+          gap: lerp(from.rim.gap, to.rim.gap, e),
+          offset: lerp(from.rim.offset, to.rim.offset, e),
+          rotate: lerp(from.rim.rotate, to.rim.rotate, e),
+        },
+        needle: {
+          x2: lerp(from.needle.x2, to.needle.x2, e),
+          y2: lerp(from.needle.y2, to.needle.y2, e),
+          opacity: lerp(from.needle.opacity, to.needle.opacity, e),
+        },
+        spokeRight: {
+          x2: lerp(from.spokeRight.x2, to.spokeRight.x2, e),
+          y2: lerp(from.spokeRight.y2, to.spokeRight.y2, e),
+          opacity: lerp(from.spokeRight.opacity, to.spokeRight.opacity, e),
+        },
+        spokeLeft: {
+          x2: lerp(from.spokeLeft.x2, to.spokeLeft.x2, e),
+          y2: lerp(from.spokeLeft.y2, to.spokeLeft.y2, e),
+          opacity: lerp(from.spokeLeft.opacity, to.spokeLeft.opacity, e),
+        },
+      });
+      if (t < 1) this.frame = requestAnimationFrame(step);
+    };
+    this.frame = requestAnimationFrame(step);
+  }
+
+  paint(s) {
+    const { rim, needle, spokeRight, spokeLeft } = this.parts;
+    rim.setAttribute('stroke-dasharray', `${s.rim.dash} ${s.rim.gap}`);
+    rim.setAttribute('stroke-dashoffset', `${s.rim.offset}`);
+    rim.style.transform = `rotate(${s.rim.rotate}deg)`;
+    rim.style.transformOrigin = '100px 100px';
+
+    needle.setAttribute('x2', s.needle.x2);
+    needle.setAttribute('y2', s.needle.y2);
+    needle.style.opacity = s.needle.opacity;
+
+    spokeRight.setAttribute('x2', s.spokeRight.x2);
+    spokeRight.setAttribute('y2', s.spokeRight.y2);
+    spokeRight.style.opacity = s.spokeRight.opacity;
+
+    spokeLeft.setAttribute('x2', s.spokeLeft.x2);
+    spokeLeft.setAttribute('y2', s.spokeLeft.y2);
+    spokeLeft.style.opacity = s.spokeLeft.opacity;
+  }
+}
+
+const svg = document.getElementById('logo');
+const animator = new LogoAnimator(svg);
+const stateTag = document.getElementById('stateTag');
+const toggleBtn = document.getElementById('toggleBtn');
+const autoCycle = document.getElementById('autoCycle');
+
+function doToggle() {
+  const next = animator.toggle();
+  stateTag.textContent = next;
+}
+
+svg.addEventListener('click', doToggle);
+toggleBtn.addEventListener('click', doToggle);
+
+let cycleTimer = null;
+autoCycle.addEventListener('change', () => {
+  if (autoCycle.checked) {
+    cycleTimer = setInterval(doToggle, 1600);
+  } else {
+    clearInterval(cycleTimer);
+  }
+});
+</script>
+</body>
+</html>
