@@ -1,5 +1,5 @@
 /// <reference types="chrome" />
-
+// file: src/background/index.ts
 /**
  * Kib-Git-QuickView Background Service Worker
  * Manifest V3 entry point handling message routing, GitHub REST API cache orchestration,
