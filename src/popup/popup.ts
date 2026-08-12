@@ -1,153 +1,52 @@
 /// <reference types="chrome" />
 // file: src/popup/popup.ts
-/**
- * GitQuickView — Extension Popup Dashboard Controller
- */
 
-export type PopupState = "loaded" | "loading" | "empty" | "error";
+import "./popup.css";
+import type {
+  ExtensionMessage,
+  MessageResponseMap,
+  GitHubUserProfile,
+  GitHubRepository,
+} from "../types/messages";
+
+export type PopupState = "initial" | "loading" | "success" | "error";
 export type ThemeMode = "dark" | "light" | "system";
 
-export interface DeveloperProfile {
+export interface LangStat {
   name: string;
-  username: string;
-  avatarUrl: string;
-  bio: string;
-  repos: number;
-  followers: string;
-  stars: string;
-  reposList: Array<{
-    name: string;
-    updatedAgo: string;
-    language: string;
-    langClass: string;
-    url: string;
-  }>;
+  count: number;
+  percentage: number;
+  color: string;
 }
 
-const MOCK_PROFILES: Record<string, DeveloperProfile> = {
-  el_richards: {
-    name: "Eleanor Richards",
-    username: "el_richards",
-    avatarUrl: "https://avatars.githubusercontent.com/u/583231?v=4",
-    bio: "Crafting performant digital experiences. Open source contributor & mechanical keyboard enthusiast.",
-    repos: 142,
-    followers: "8.4k",
-    stars: "12k",
-    reposList: [
-      {
-        name: "artisan-ui",
-        updatedAgo: "Updated 2h ago",
-        language: "TypeScript",
-        langClass: "lang-typescript",
-        url: "https://github.com",
-      },
-      {
-        name: "mech-kb-firmware",
-        updatedAgo: "Updated 1d ago",
-        language: "C++",
-        langClass: "lang-cpp",
-        url: "https://github.com",
-      },
-      {
-        name: "dotfiles",
-        updatedAgo: "Updated 3d ago",
-        language: "Shell",
-        langClass: "lang-shell",
-        url: "https://github.com",
-      },
-    ],
-  },
-  torvalds: {
-    name: "Linus Torvalds",
-    username: "torvalds",
-    avatarUrl: "https://avatars.githubusercontent.com/u/1024025?v=4",
-    bio: "Creator of Linux and Git. Monomaniacal about kernel stability.",
-    repos: 8,
-    followers: "220k",
-    stars: "185k",
-    reposList: [
-      {
-        name: "linux",
-        updatedAgo: "Updated 10m ago",
-        language: "C",
-        langClass: "lang-cpp",
-        url: "https://github.com/torvalds/linux",
-      },
-      {
-        name: "pesign",
-        updatedAgo: "Updated 2w ago",
-        language: "C",
-        langClass: "lang-cpp",
-        url: "https://github.com/torvalds/pesign",
-      },
-      {
-        name: "uemacs",
-        updatedAgo: "Updated 1m ago",
-        language: "C",
-        langClass: "lang-cpp",
-        url: "https://github.com/torvalds/uemacs",
-      },
-    ],
-  },
-  gaearon: {
-    name: "Dan Abramov",
-    username: "gaearon",
-    avatarUrl: "https://avatars.githubusercontent.com/u/810438?v=4",
-    bio: "Building things for web developers. Ex-React core team.",
-    repos: 260,
-    followers: "82k",
-    stars: "45k",
-    reposList: [
-      {
-        name: "redudx",
-        updatedAgo: "Updated 1d ago",
-        language: "TypeScript",
-        langClass: "lang-typescript",
-        url: "https://github.com/gaearon",
-      },
-      {
-        name: "overreacted.io",
-        updatedAgo: "Updated 4d ago",
-        language: "JavaScript",
-        langClass: "lang-typescript",
-        url: "https://github.com/gaearon",
-      },
-    ],
-  },
-  sindresorhus: {
-    name: "Sindre Sorhus",
-    username: "sindresorhus",
-    avatarUrl: "https://avatars.githubusercontent.com/u/170270?v=4",
-    bio: "Full-time open-sourceror. 1,000+ npm packages & Swift apps.",
-    repos: 1120,
-    followers: "68k",
-    stars: "95k",
-    reposList: [
-      {
-        name: "awesome",
-        updatedAgo: "Updated 1h ago",
-        language: "Markdown",
-        langClass: "lang-shell",
-        url: "https://github.com/sindresorhus/awesome",
-      },
-      {
-        name: "type-fest",
-        updatedAgo: "Updated 5h ago",
-        language: "TypeScript",
-        langClass: "lang-typescript",
-        url: "https://github.com/sindresorhus/type-fest",
-      },
-    ],
-  },
-};
-
-// TODO: use messaging system in background/service-worker. no actual op in options.html scope.
 export class PopupController {
+  private currentState: PopupState = "initial";
   private currentTheme: ThemeMode = "dark";
+  private currentUsername: string = "";
+  private abortController: AbortController | null = null;
 
   constructor() {
     this.initTheme();
     this.bindEvents();
+    this.setState("initial");
+  }
+
+  /* --- Extension Message Helper --- */
+  private sendExtensionMessage<T extends ExtensionMessage>(
+    message: T,
+  ): Promise<MessageResponseMap[T["type"]]> {
+    return new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage(
+        message,
+        (response: MessageResponseMap[T["type"]]) => {
+          if (chrome.runtime.lastError) {
+            reject(new Error(chrome.runtime.lastError.message));
+            return;
+          }
+          resolve(response);
+        },
+      );
+    });
   }
 
   /* --- Theme Management --- */
@@ -175,115 +74,278 @@ export class PopupController {
     }
   }
 
-  public cycleTheme(): void {
-    const modes: ThemeMode[] = ["dark", "light", "system"];
-    const nextIndex = (modes.indexOf(this.currentTheme) + 1) % modes.length;
-    const nextMode = modes[nextIndex];
+  public toggleTheme(): void {
+    const nextMode: ThemeMode = this.currentTheme === "light" ? "dark" : "light";
     this.setTheme(nextMode);
     this.showToast(`Theme switched to: ${nextMode.toUpperCase()}`);
   }
 
-  /* --- View State Switcher --- */
+  /* --- State Management --- */
   public setState(state: PopupState): void {
+    this.currentState = state;
     const main = document.getElementById("main-content");
     if (main) {
       main.setAttribute("data-state", state);
     }
   }
 
-  /* --- Render Profile --- */
-  public renderProfile(profile: DeveloperProfile): void {
+  /* --- Search Trigger --- */
+  public async handleSearch(username: string): void {
+    const cleanUsername = username.trim().replace(/^@/, "");
+    
+    // Empty submit handling
+    if (!cleanUsername) {
+      this.showInputErrorCue("Please enter a valid GitHub username");
+      return;
+    }
+
+    this.hideInputErrorCue();
+    this.currentUsername = cleanUsername;
+
+    // Transition to LOADING state
     this.setState("loading");
+    this.updateLoadingUI(cleanUsername);
 
-    setTimeout(() => {
-      const avatar = document.getElementById("user-avatar") as HTMLImageElement;
-      const name = document.getElementById("user-name");
-      const handle = document.getElementById(
-        "user-handle",
-      ) as HTMLAnchorElement;
-      const bio = document.getElementById("user-bio");
-      const repos = document.getElementById("stat-repos");
-      const followers = document.getElementById("stat-followers");
-      const stars = document.getElementById("stat-stars");
-      const repoList = document.getElementById("repo-list");
+    try {
+      // 1. Fetch User Profile
+      this.updateTerminalLog("> Querying GitHub API profile endpoint...");
+      
+      let profile: GitHubUserProfile | null = null;
 
-      if (avatar) avatar.src = profile.avatarUrl;
-      if (name) name.textContent = profile.name;
-      if (handle) {
-        handle.textContent = `@${profile.username}`;
-        handle.href = `https://github.com/${profile.username}`;
-      }
-      if (bio) bio.textContent = profile.bio;
-      if (repos) repos.textContent = String(profile.repos);
-      if (followers) followers.textContent = profile.followers;
-      if (stars) stars.textContent = profile.stars;
-
-      if (repoList) {
-        repoList.innerHTML = profile.reposList
-          .map(
-            (r) => `
-          <a href="${r.url}" target="_blank" rel="noopener" class="repo-card">
-            <div class="repo-info">
-              <div class="repo-title-row">
-                <svg class="repo-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                </svg>
-                <span class="repo-name">${r.name}</span>
-              </div>
-              <span class="repo-meta">${r.updatedAgo}</span>
-            </div>
-            <span class="language-badge ${r.langClass}">${r.language}</span>
-          </a>
-        `,
-          )
-          .join("");
-      }
-
-      this.setState("loaded");
-    }, 400);
-  }
-
-  /* --- Search Handling --- */
-  public handleSearch(username: string): void {
-    const key = username.toLowerCase().trim().replace(/^@/, "");
-    if (!key) return;
-
-    if (MOCK_PROFILES[key]) {
-      this.renderProfile(MOCK_PROFILES[key]);
-    } else {
-      this.setState("loading");
-      setTimeout(() => {
-        this.renderProfile({
-          name: key,
-          username: key,
-          avatarUrl: `https://avatars.githubusercontent.com/${key}`,
-          bio: `GitHub developer account for @${key}. Public activity and repos fetched via GitHub API.`,
-          repos: Math.floor(Math.random() * 80) + 5,
-          followers: `${(Math.random() * 5).toFixed(1)}k`,
-          stars: `${(Math.random() * 8).toFixed(1)}k`,
-          reposList: [
-            {
-              name: `${key}-core`,
-              updatedAgo: "Updated 1d ago",
-              language: "TypeScript",
-              langClass: "lang-typescript",
-              url: `https://github.com/${key}`,
-            },
-            {
-              name: "configs",
-              updatedAgo: "Updated 5d ago",
-              language: "Shell",
-              langClass: "lang-shell",
-              url: `https://github.com/${key}`,
-            },
-          ],
+      if (typeof chrome !== "undefined" && chrome.runtime?.sendMessage) {
+        const response = await this.sendExtensionMessage({
+          type: "FETCH_USER_PROFILE",
+          payload: { username: cleanUsername },
         });
-      }, 500);
+
+        if (!response.success || !response.data) {
+          throw new Error(response.error || "Failed to fetch profile");
+        }
+        profile = response.data;
+      } else {
+        // Fallback for standalone preview / mock testing
+        await new Promise((r) => setTimeout(r, 600));
+        profile = {
+          username: cleanUsername,
+          name: cleanUsername === "octocat" ? "The Octocat" : cleanUsername,
+          avatarUrl: `https://avatars.githubusercontent.com/${cleanUsername}`,
+          bio: "GitHub developer account & open-source contributor.",
+          publicRepos: 142,
+          followers: 8400,
+          following: 120,
+          location: "San Francisco, CA",
+          htmlUrl: `https://github.com/${cleanUsername}`,
+        };
+      }
+
+      // 2. Fetch User Repos for language analysis
+      this.updateTerminalLog("> Fetching repository manifests & top languages...");
+      
+      let repos: GitHubRepository[] = [];
+      if (typeof chrome !== "undefined" && chrome.runtime?.sendMessage) {
+        try {
+          const repoResponse = await this.sendExtensionMessage({
+            type: "FETCH_USER_REPOS",
+            payload: { username: cleanUsername, limit: 10 },
+          });
+          if (repoResponse.success && repoResponse.data) {
+            repos = repoResponse.data;
+          }
+        } catch {
+          // Non-fatal if repos fail; we still render profile
+        }
+      }
+
+      // Transition to SUCCESS state
+      this.renderSuccessProfile(profile, repos);
+
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      this.renderErrorState(errorMessage, cleanUsername);
     }
   }
 
-  /* --- Toast Notifications --- */
+  private updateLoadingUI(username: string): void {
+    const usernameEl = document.getElementById("loading-username");
+    if (usernameEl) {
+      usernameEl.textContent = `@${username}`;
+    }
+    this.updateTerminalLog("> Initializing sensor array...");
+  }
+
+  private updateTerminalLog(text: string): void {
+    const logEl = document.getElementById("terminal-log-text");
+    if (logEl) {
+      logEl.textContent = text;
+    }
+  }
+
+  /* --- Success Rendering --- */
+  private renderSuccessProfile(profile: GitHubUserProfile, repos: GitHubRepository[]): void {
+    const avatar = document.getElementById("user-avatar") as HTMLImageElement;
+    const name = document.getElementById("user-name");
+    const bio = document.getElementById("user-bio");
+    const locationRow = document.getElementById("user-location");
+    const locationText = document.getElementById("user-location-text");
+
+    const reposEl = document.getElementById("stat-repos");
+    const followersEl = document.getElementById("stat-followers");
+    const starsEl = document.getElementById("stat-stars");
+
+    const githubLink = document.getElementById("btn-github-profile") as HTMLAnchorElement;
+
+    if (avatar) {
+      avatar.src = profile.avatarUrl || `https://avatars.githubusercontent.com/${profile.username}`;
+    }
+    if (name) {
+      name.textContent = profile.name || profile.username;
+    }
+    if (bio) {
+      bio.textContent = profile.bio || "No public bio provided.";
+    }
+
+    if (locationRow && locationText) {
+      if (profile.location) {
+        locationText.textContent = profile.location;
+        locationRow.style.display = "flex";
+      } else {
+        locationRow.style.display = "none";
+      }
+    }
+
+    if (reposEl) reposEl.textContent = this.formatNumber(profile.publicRepos || 0);
+    if (followersEl) followersEl.textContent = this.formatNumber(profile.followers || 0);
+
+    // Calculate total stars from fetched repos or estimate
+    const totalStars = repos.reduce((sum, r) => sum + (r.stargazersCount || 0), 0);
+    if (starsEl) starsEl.textContent = this.formatNumber(totalStars > 0 ? totalStars : (profile.publicRepos * 3));
+
+    if (githubLink) {
+      githubLink.href = profile.htmlUrl || `https://github.com/${profile.username}`;
+    }
+
+    // Render Top Languages
+    this.renderTopLanguages(repos);
+
+    this.setState("success");
+  }
+
+  private renderTopLanguages(repos: GitHubRepository[]): void {
+    const langBar = document.getElementById("lang-bar");
+    const langLegend = document.getElementById("lang-legend");
+
+    const langCounts: Record<string, number> = {};
+    repos.forEach((r) => {
+      if (r.language) {
+        langCounts[r.language] = (langCounts[r.language] || 0) + 1;
+      }
+    });
+
+    const total = Object.values(langCounts).reduce((a, b) => a + b, 0);
+
+    let stats: LangStat[] = [];
+    if (total > 0) {
+      const colors = ["#8b3a16", "#6b583e", "#8e7c6d", "#a08c70"];
+      stats = Object.entries(langCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([lang, count], idx) => ({
+          name: lang,
+          count,
+          percentage: Math.round((count / total) * 100),
+          color: colors[idx % colors.length],
+        }));
+    } else {
+      // Fallback default language breakdown
+      stats = [
+        { name: "TypeScript", count: 5, percentage: 50, color: "#8b3a16" },
+        { name: "C++", count: 3, percentage: 30, color: "#6b583e" },
+        { name: "Shell", count: 2, percentage: 20, color: "#8e7c6d" },
+      ];
+    }
+
+    if (langBar) {
+      langBar.innerHTML = stats
+        .map(
+          (s) => `<div class="lang-segment" style="width: ${s.percentage}%; background-color: ${s.color};" title="${s.name}: ${s.percentage}%"></div>`
+        )
+        .join("");
+    }
+
+    if (langLegend) {
+      langLegend.innerHTML = stats
+        .map(
+          (s) => `<span class="lang-item"><span class="lang-dot" style="background-color: ${s.color};"></span> ${s.name}</span>`
+        )
+        .join("");
+    }
+  }
+
+  /* --- Error State Handling --- */
+  private renderErrorState(rawError: string, username: string): void {
+    const errorTitle = document.getElementById("error-title");
+    const errorDesc = document.getElementById("error-description");
+    const errorInput = document.getElementById("search-input-error") as HTMLInputElement;
+    const errorActionBtn = document.getElementById("btn-error-action");
+
+    if (errorInput) {
+      errorInput.value = username;
+    }
+
+    const lowerErr = rawError.toLowerCase();
+
+    if (lowerErr.includes("404") || lowerErr.includes("not found")) {
+      if (errorTitle) errorTitle.textContent = "Username Not Found";
+      if (errorDesc) {
+        errorDesc.textContent = `The account "@${username}" does not exist on GitHub. Check for spelling errors or try another username.`;
+      }
+      if (errorActionBtn) errorActionBtn.textContent = "SEARCH AGAIN \u2192";
+    } else if (lowerErr.includes("rate limit") || lowerErr.includes("403")) {
+      if (errorTitle) errorTitle.textContent = "Rate Limit Reached";
+      if (errorDesc) {
+        errorDesc.textContent = "GitHub API rate limit exceeded. Authenticate with a PAT in settings for higher limits.";
+      }
+      if (errorActionBtn) errorActionBtn.textContent = "OPEN SETTINGS \u2192";
+    } else if (lowerErr.includes("network") || lowerErr.includes("failed to fetch") || !navigator.onLine) {
+      if (errorTitle) errorTitle.textContent = "Connection Error";
+      if (errorDesc) {
+        errorDesc.textContent = "Network request failed. Please check your internet connection and try again.";
+      }
+      if (errorActionBtn) errorActionBtn.textContent = "RETRY SEARCH \u2192";
+    } else {
+      if (errorTitle) errorTitle.textContent = "Unable to Fetch Profile";
+      if (errorDesc) {
+        errorDesc.textContent = rawError || "An unexpected error occurred while communicating with GitHub.";
+      }
+      if (errorActionBtn) errorActionBtn.textContent = "RETRY \u2192";
+    }
+
+    this.setState("error");
+  }
+
+  /* --- Input Cue Helper --- */
+  private showInputErrorCue(message: string): void {
+    const cue = document.getElementById("search-error-cue");
+    if (cue) {
+      cue.textContent = message;
+      cue.hidden = false;
+    }
+  }
+
+  private hideInputErrorCue(): void {
+    const cue = document.getElementById("search-error-cue");
+    if (cue) {
+      cue.hidden = true;
+    }
+  }
+
+  /* --- Utility Functions --- */
+  private formatNumber(num: number): string {
+    if (num >= 1000000) return (num / 1000000).toFixed(1) + "m";
+    if (num >= 1000) return (num / 1000).toFixed(1) + "k";
+    return String(num);
+  }
+
   public showToast(message: string): void {
     const container = document.getElementById("toast-container");
     if (!container) return;
@@ -293,61 +355,119 @@ export class PopupController {
     toast.textContent = message;
 
     container.appendChild(toast);
-    setTimeout(() => toast.remove(), 2400);
+    setTimeout(() => toast.remove(), 2200);
   }
 
   /* --- Event Listeners Binding --- */
   private bindEvents(): void {
     // Theme toggle
     document.getElementById("theme-toggle")?.addEventListener("click", () => {
-      this.cycleTheme();
+      this.toggleTheme();
     });
 
-    // Search form
-    const form = document.getElementById("search-form") as HTMLFormElement;
-    form?.addEventListener("submit", (e) => {
+    // Initial Search Form
+    const initialForm = document.getElementById("search-form-initial") as HTMLFormElement;
+    initialForm?.addEventListener("submit", (e) => {
       e.preventDefault();
-      const input = document.getElementById("search-input") as HTMLInputElement;
-      if (input.value) {
-        this.handleSearch(input.value);
-        input.value = "";
+      const input = document.getElementById("search-input-initial") as HTMLInputElement;
+      this.handleSearch(input?.value || "");
+    });
+
+    // Error Search Form
+    const errorForm = document.getElementById("search-form-error") as HTMLFormElement;
+    errorForm?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const input = document.getElementById("search-input-error") as HTMLInputElement;
+      const title = document.getElementById("error-title")?.textContent || "";
+      if (title === "Rate Limit Reached") {
+        if (typeof chrome !== "undefined" && chrome.runtime?.openOptionsPage) {
+          chrome.runtime.openOptionsPage();
+        }
+      } else {
+        this.handleSearch(input?.value || "");
       }
     });
 
-    // Quick user chips in empty state
-    document.querySelectorAll(".chip-btn").forEach((btn) => {
-      btn.addEventListener("click", (e) => {
-        const username = (e.currentTarget as HTMLElement).getAttribute(
-          "data-username",
-        );
-        if (username) this.handleSearch(username);
-      });
+    // Quick Try Link (octocat)
+    document.getElementById("btn-try-octocat")?.addEventListener("click", () => {
+      const input = document.getElementById("search-input-initial") as HTMLInputElement;
+      if (input) input.value = "octocat";
+      this.handleSearch("octocat");
     });
 
-    // Options button (Opens options.html)
-    document.getElementById("btn-options")?.addEventListener("click", () => {
+    // Abort Sequence Button
+    document.getElementById("btn-abort-sequence")?.addEventListener("click", () => {
+      this.setState("initial");
+      this.showToast("Search sequence cancelled");
+    });
+
+    // Search another username link
+    document.getElementById("btn-search-another")?.addEventListener("click", () => {
+      this.setState("initial");
+    });
+
+    // Reset from error view back to initial
+    document.getElementById("btn-error-reset")?.addEventListener("click", () => {
+      this.setState("initial");
+    });
+
+    // Explore in Side Panel button
+    document.getElementById("btn-sidepanel-explore")?.addEventListener("click", () => {
+      if (typeof chrome !== "undefined" && chrome.sidePanel?.open) {
+        chrome.windows.getCurrent((win) => {
+          if (win.id) {
+            chrome.sidePanel.open({ windowId: win.id });
+          }
+        });
+      } else {
+        this.showToast("Opening side panel...");
+      }
+    });
+
+    // Footer Navigation Tabs
+    document.getElementById("nav-btn-search")?.addEventListener("click", () => {
+      this.setNavActive("nav-btn-search");
+      if (this.currentState !== "success") {
+        this.setState("initial");
+      }
+    });
+
+    document.getElementById("nav-btn-history")?.addEventListener("click", () => {
+      this.setNavActive("nav-btn-history");
       if (typeof chrome !== "undefined" && chrome.runtime?.openOptionsPage) {
         chrome.runtime.openOptionsPage();
       } else {
-        this.showToast("TODO: Opening options.html (Coming Soon in v0.2)");
+        this.showToast("History opened in Settings");
       }
     });
 
-    // Side panel button (Coming soon indicator)
-    document.getElementById("btn-sidepanel")?.addEventListener("click", () => {
-      this.showToast("Side Panel mode — Planned for v0.2.0");
+    document.getElementById("nav-btn-settings")?.addEventListener("click", () => {
+      this.setNavActive("nav-btn-settings");
+      if (typeof chrome !== "undefined" && chrome.runtime?.openOptionsPage) {
+        chrome.runtime.openOptionsPage();
+      } else {
+        this.showToast("Opening Settings...");
+      }
     });
 
-    // Activity options button
-    document
-      .getElementById("btn-activity-more")
-      ?.addEventListener("click", () => {
-        this.showToast("Activity Filters — Coming Soon");
-      });
-
-    // Retry button in error state
-    document.getElementById("btn-retry")?.addEventListener("click", () => {
-      this.handleSearch("el_richards");
+    // Documentation / Changelog links
+    document.getElementById("link-docs")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (typeof chrome !== "undefined" && chrome.runtime?.openOptionsPage) {
+        chrome.runtime.openOptionsPage();
+      }
     });
+
+    document.getElementById("link-changelog")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (typeof chrome !== "undefined" && chrome.runtime?.openOptionsPage) {
+        chrome.runtime.openOptionsPage();
+      }
+    });
+  }
+
+  private setNavActive(btnId: string): void {
+    document.querySelectorAll(".nav-tab").forEach((tab) => tab.classList.remove("active"));
+    document.getElementById(btnId)?.classList.add("active");
   }
 }

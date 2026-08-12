@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GitQuickView — Compact Developer Dashboard</title>
+  <title>KibGitQuickView — Developer Dashboard</title>
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -22,43 +22,22 @@
     <!-- Header Navigation -->
     <header class="popup-header">
       <div class="brand">
-        <div class="brand-logo" title="GitQuickView Logo">
-          <svg width="22" height="22" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="38" height="38" rx="8" fill="currentColor" class="logo-bg" />
-            <circle cx="19" cy="19" r="14" stroke="var(--color-logo-stroke)" stroke-width="2.5" fill="none"/>
-            <path d="M12 24 C14 18, 24 18, 26 24" stroke="var(--color-logo-stroke)" stroke-width="2" stroke-linecap="round" fill="none"/>
-            <path d="M19 19 L25 12" stroke="var(--color-accent-rust)" stroke-width="3" stroke-linecap="round"/>
-            <circle cx="19" cy="19" r="2.5" fill="var(--color-logo-stroke)"/>
+        <div class="brand-logo" title="KibGitQuickView Logo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="4 17 10 11 4 5"></polyline>
+            <line x1="12" y1="19" x2="20" y2="19"></line>
           </svg>
         </div>
-        <span class="brand-title">GitQuickView</span>
+        <span class="brand-title">KibGitQuickView</span>
       </div>
 
       <div class="header-controls">
-        <!-- Search Input Bar -->
-        <form id="search-form" class="search-box">
-          <input 
-            type="text" 
-            id="search-input" 
-            placeholder="Search user..." 
-            autocomplete="off" 
-            spellcheck="false" 
-            aria-label="Search GitHub Username"
-          />
-          <button type="submit" class="btn-search" title="Search User">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-              <polyline points="12 5 19 12 12 19"></polyline>
-            </svg>
-          </button>
-        </form>
-
         <!-- Theme Toggle Button -->
-        <button id="theme-toggle" class="btn-icon" title="Toggle Theme (Dark / Light / System)">
-          <svg class="icon-dark" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <button id="theme-toggle" class="btn-icon" title="Toggle Theme">
+          <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
           </svg>
-          <svg class="icon-light" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="5"></circle>
             <line x1="12" y1="1" x2="12" y2="3"></line>
             <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -69,203 +48,261 @@
             <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
             <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
           </svg>
-          <svg class="icon-system" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-            <line x1="8" y1="21" x2="16" y2="21"></line>
-            <line x1="12" y1="17" x2="12" y2="21"></line>
-          </svg>
-        </button>
-
-        <!-- Options Page Link -->
-        <button id="btn-options" class="btn-icon" title="Settings & Token Configuration">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="3"></circle>
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-          </svg>
         </button>
       </div>
     </header>
 
-    <!-- Main View Switcher Container -->
-    <main id="main-content" class="main-content" data-state="loaded">
+    <!-- Main Dynamic Content Area -->
+    <main id="main-content" class="main-content" data-state="initial">
 
-      <!-- 1. LOADED PROFILE VIEW -->
-      <section id="view-profile" class="view-panel view-loaded">
-        <!-- Profile Card -->
-        <div class="profile-card">
-          <div class="avatar-wrapper">
-            <img id="user-avatar" src="https://avatars.githubusercontent.com/u/583231?v=4" alt="User Avatar" class="avatar-img" />
-            <div class="avatar-badge" title="Developer Active">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="16 18 22 12 16 6"></polyline>
-                <polyline points="8 6 2 12 8 18"></polyline>
+      <!-- 1. INITIAL / READY STATE -->
+      <section id="view-initial" class="view-panel view-initial">
+        <div class="initial-card">
+          <div class="icon-box-large">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+              <circle cx="17" cy="17" r="3"></circle>
+              <line x1="19.1" y1="19.1" x2="21" y2="21"></line>
+            </svg>
+          </div>
+
+          <h1 class="hero-title">See a GitHub profile at a glance.</h1>
+          <p class="hero-subtitle">
+            Enter a GitHub username to quickly view repositories, commit activity, and language usage in a clean, focused dashboard.
+          </p>
+
+          <form id="search-form-initial" class="search-form-group">
+            <div class="search-input-wrapper">
+              <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
+              <input 
+                type="text" 
+                id="search-input-initial" 
+                placeholder="github username" 
+                autocomplete="off" 
+                spellcheck="false"
+                aria-label="GitHub username input"
+              />
+            </div>
+            <div id="search-error-cue" class="input-error-cue" hidden>Please enter a valid GitHub username</div>
+            <button type="submit" class="btn-primary-rust">
+              SEARCH &rarr;
+            </button>
+          </form>
+
+          <div class="try-prompt">
+            <span class="lightbulb">💡</span> Try: <button type="button" id="btn-try-octocat" class="try-link">octocat</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. LOADING STATE -->
+      <section id="view-loading" class="view-panel view-loading">
+        <div class="loading-card">
+          <span class="badge-tag-mono">TARGET ACQUIRED</span>
+          
+          <div class="target-user-display">
+            <div class="user-avatar-placeholder">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>
+            <h2 id="loading-username" class="target-username">@octocat</h2>
+          </div>
+
+          <div class="sensor-array-header">
+            <span class="sensor-label">SENSOR ARRAY</span>
+            <span class="status-active">&bull; Active</span>
+          </div>
+
+          <div class="progress-bar-container">
+            <div id="loading-progress-bar" class="progress-bar-fill"></div>
+          </div>
+
+          <div class="terminal-log-box">
+            <div class="terminal-header">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              </svg>
+              <span>Sequence Log</span>
+            </div>
+            <div id="terminal-log-text" class="terminal-body">
+              &gt; Loading repository manifest...
             </div>
           </div>
 
-          <h1 id="user-name" class="profile-name">Eleanor Richards</h1>
-          <a id="user-handle" href="https://github.com" target="_blank" rel="noopener" class="profile-handle">@el_richards</a>
-          
-          <p id="user-bio" class="profile-bio">
-            Crafting performant digital experiences. Open source contributor &amp; mechanical keyboard enthusiast.
-          </p>
-        </div>
-
-        <!-- Metrics Stats Grid -->
-        <div class="stats-grid">
-          <div class="stat-card">
-            <span class="stat-label">REPOS</span>
-            <span id="stat-repos" class="stat-value">142</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-label">FOLLOWERS</span>
-            <span id="stat-followers" class="stat-value">8.4k</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-label">STARS</span>
-            <span id="stat-stars" class="stat-value">12k</span>
-          </div>
-        </div>
-
-        <!-- Recent Activity Feed -->
-        <div class="section-container">
-          <div class="section-header">
-            <h2 class="section-title">RECENT ACTIVITY</h2>
-            <button id="btn-activity-more" class="btn-more" title="Activity Options">
-              <span>•••</span>
-            </button>
-          </div>
-
-          <div id="repo-list" class="repo-list">
-            <!-- Repo Card 1 -->
-            <a href="https://github.com" target="_blank" rel="noopener" class="repo-card">
-              <div class="repo-info">
-                <div class="repo-title-row">
-                  <svg class="repo-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                  </svg>
-                  <span class="repo-name">artisan-ui</span>
-                </div>
-                <span class="repo-meta">Updated 2h ago</span>
-              </div>
-              <span class="language-badge lang-typescript">TypeScript</span>
-            </a>
-
-            <!-- Repo Card 2 -->
-            <a href="https://github.com" target="_blank" rel="noopener" class="repo-card">
-              <div class="repo-info">
-                <div class="repo-title-row">
-                  <svg class="repo-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                  </svg>
-                  <span class="repo-name">mech-kb-firmware</span>
-                </div>
-                <span class="repo-meta">Updated 1d ago</span>
-              </div>
-              <span class="language-badge lang-cpp">C++</span>
-            </a>
-
-            <!-- Repo Card 3 -->
-            <a href="https://github.com" target="_blank" rel="noopener" class="repo-card">
-              <div class="repo-info">
-                <div class="repo-title-row">
-                  <svg class="repo-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                  </svg>
-                  <span class="repo-name">dotfiles</span>
-                </div>
-                <span class="repo-meta">Updated 3d ago</span>
-              </div>
-              <span class="language-badge lang-shell">Shell</span>
-            </a>
-          </div>
+          <button type="button" id="btn-abort-sequence" class="btn-text-mono">
+            ABORT SEQUENCE
+          </button>
         </div>
       </section>
 
-      <!-- 2. LOADING STATE VIEW (Skeleton Shimmers) -->
-      <section id="view-loading" class="view-panel view-loading">
-        <div class="profile-card skeleton-card">
-          <div class="skeleton avatar-skeleton"></div>
-          <div class="skeleton text-skeleton title-skeleton"></div>
-          <div class="skeleton text-skeleton handle-skeleton"></div>
-          <div class="skeleton text-skeleton bio-skeleton"></div>
-          <div class="skeleton text-skeleton bio-skeleton-2"></div>
-        </div>
-
-        <div class="stats-grid">
-          <div class="stat-card skeleton-stat"><div class="skeleton stat-skeleton-inner"></div></div>
-          <div class="stat-card skeleton-stat"><div class="skeleton stat-skeleton-inner"></div></div>
-          <div class="stat-card skeleton-stat"><div class="skeleton stat-skeleton-inner"></div></div>
-        </div>
-
-        <div class="section-container">
-          <div class="skeleton section-title-skeleton"></div>
-          <div class="repo-list">
-            <div class="skeleton repo-card-skeleton"></div>
-            <div class="skeleton repo-card-skeleton"></div>
-            <div class="skeleton repo-card-skeleton"></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 3. EMPTY STATE VIEW -->
-      <section id="view-empty" class="view-panel view-empty">
-        <div class="empty-box">
-          <div class="empty-icon">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      <!-- 3. SUCCESS / SUMMARY STATE -->
+      <section id="view-success" class="view-panel view-success">
+        <div class="summary-card">
+          <div class="success-badge-top">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
           </div>
-          <h3 class="empty-title">Inspect Any GitHub Developer</h3>
-          <p class="empty-text">Enter a GitHub handle above to view public activity, languages, and repo statistics instantly.</p>
-          
-          <div class="quick-chips">
-            <span class="chips-label">Quick Try:</span>
-            <button class="chip-btn" data-username="torvalds">@torvalds</button>
-            <button class="chip-btn" data-username="gaearon">@gaearon</button>
-            <button class="chip-btn" data-username="sindresorhus">@sindresorhus</button>
+
+          <div class="profile-avatar-container">
+            <img id="user-avatar" src="" alt="User Avatar" class="profile-avatar-img" />
+            <div class="dev-badge">&lt;&gt; DEV</div>
+          </div>
+
+          <h1 id="user-name" class="user-display-name">Eleanor Richards</h1>
+          <div id="user-location" class="user-location-row">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            <span id="user-location-text">San Francisco, CA</span>
+          </div>
+
+          <p id="user-bio" class="user-bio-text">
+            Senior Systems Engineer passionate about distributed systems and open-source tooling.
+          </p>
+
+          <hr class="card-divider" />
+
+          <div class="stats-triplet">
+            <div class="stat-col">
+              <span id="stat-repos" class="stat-num">142</span>
+              <span class="stat-lbl">REPOS</span>
+            </div>
+            <div class="stat-vdivider"></div>
+            <div class="stat-col">
+              <span id="stat-followers" class="stat-num">8.4k</span>
+              <span class="stat-lbl">FOLLOWERS</span>
+            </div>
+            <div class="stat-vdivider"></div>
+            <div class="stat-col">
+              <span id="stat-stars" class="stat-num">12k</span>
+              <span class="stat-lbl">STARS</span>
+            </div>
+          </div>
+
+          <hr class="card-divider" />
+
+          <div class="languages-section">
+            <span class="section-sublabel">TOP LANGUAGES</span>
+            
+            <div id="lang-bar" class="lang-bar-container">
+              <div class="lang-segment lang-seg-1" style="width: 50%;"></div>
+              <div class="lang-segment lang-seg-2" style="width: 30%;"></div>
+              <div class="lang-segment lang-seg-3" style="width: 20%;"></div>
+            </div>
+
+            <div id="lang-legend" class="lang-legend-row">
+              <span class="lang-item"><span class="lang-dot dot-1"></span> TypeScript</span>
+              <span class="lang-item"><span class="lang-dot dot-2"></span> C++</span>
+              <span class="lang-item"><span class="lang-dot dot-3"></span> Shell</span>
+            </div>
+          </div>
+
+          <div class="action-buttons-stack">
+            <button id="btn-sidepanel-explore" class="btn-primary-rust btn-full">
+              Explore in side panel &rarr;
+            </button>
+            <a id="btn-github-profile" href="https://github.com" target="_blank" rel="noopener" class="btn-outline-rust btn-full">
+              Open GitHub profile <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            </a>
+          </div>
+
+          <div class="search-again-wrapper">
+            <button id="btn-search-another" class="btn-link-subtle">
+              &larr; Search another username
+            </button>
           </div>
         </div>
       </section>
 
-      <!-- 4. ERROR STATE VIEW -->
+      <!-- 4. ERROR / RECOVERABLE STATE -->
       <section id="view-error" class="view-panel view-error">
-        <div class="error-box">
-          <div class="error-icon">
-            <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <div class="error-card">
+          <div class="error-icon-wrapper">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="10"></circle>
               <line x1="12" y1="8" x2="12" y2="12"></line>
               <line x1="12" y1="16" x2="12.01" y2="16"></line>
             </svg>
           </div>
-          <h3 id="error-title" class="error-title">User Not Found</h3>
-          <p id="error-message" class="error-text">Could not fetch profile for the requested GitHub account. Please check the spelling or rate limit.</p>
-          <button id="btn-retry" class="btn-primary">Try Again</button>
+
+          <h2 id="error-title" class="error-heading">User Not Found</h2>
+          <p id="error-description" class="error-body">
+            We couldn't find a GitHub account matching this username. Please verify spelling.
+          </p>
+
+          <form id="search-form-error" class="search-form-group">
+            <div class="search-input-wrapper">
+              <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input 
+                type="text" 
+                id="search-input-error" 
+                placeholder="github username" 
+                autocomplete="off" 
+                spellcheck="false"
+              />
+            </div>
+            <button type="submit" id="btn-error-action" class="btn-primary-rust">
+              RETRY SEARCH &rarr;
+            </button>
+          </form>
+
+          <div class="error-back-row">
+            <button type="button" id="btn-error-reset" class="btn-link-subtle">
+              Back to Search Home
+            </button>
+          </div>
         </div>
       </section>
 
     </main>
 
-    <!-- Footer Controls -->
+    <!-- Footer Area -->
     <footer class="popup-footer">
-      <div class="footer-info">
-        <span class="version-tag">GitQuickView v0.0.1</span>
-        <span class="bullet">•</span>
-        <span id="rate-limit-tag" class="rate-limit-tag">Rate Limit: 4950/5000</span>
+      <div class="footer-links-row">
+        <a href="https://github.com" target="_blank" rel="noopener" class="footer-link" id="link-docs">Documentation</a>
+        <span class="footer-bullet">&bull;</span>
+        <a href="https://github.com" target="_blank" rel="noopener" class="footer-link" id="link-changelog">Changelog</a>
+        <span class="footer-bullet">&bull;</span>
+        <span class="footer-version">v1.0.4</span>
       </div>
 
-      <button id="btn-sidepanel" class="btn-sidepanel" title="Open in side panel">
-        <span>Open in side panel</span>
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-          <polyline points="15 3 21 3 21 9"></polyline>
-          <line x1="10" y1="14" x2="21" y2="3"></line>
-        </svg>
-      </button>
+      <nav class="footer-nav">
+        <button id="nav-btn-search" class="nav-tab active" title="Search">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <span>Search</span>
+        </button>
+
+        <button id="nav-btn-history" class="nav-tab" title="History">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span>History</span>
+        </button>
+
+        <button id="nav-btn-settings" class="nav-tab" title="Settings">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          <span>Settings</span>
+        </button>
+      </nav>
     </footer>
 
   </div>
