@@ -2,6 +2,7 @@
 // file: src/popup/popup.ts
 
 import "./popup.css";
+
 import type {
   ExtensionMessage,
   MessageResponseMap,
@@ -23,7 +24,7 @@ export class PopupController {
   private currentState: PopupState = "initial";
   private currentTheme: ThemeMode = "dark";
   private currentUsername: string = "";
-  private abortController: AbortController | null = null;
+  // private abortController: AbortController | null = null; // 'abortController' is declared but its value is never read.
 
   constructor() {
     this.initTheme();
@@ -75,7 +76,8 @@ export class PopupController {
   }
 
   public toggleTheme(): void {
-    const nextMode: ThemeMode = this.currentTheme === "light" ? "dark" : "light";
+    const nextMode: ThemeMode =
+      this.currentTheme === "light" ? "dark" : "light";
     this.setTheme(nextMode);
     this.showToast(`Theme switched to: ${nextMode.toUpperCase()}`);
   }
@@ -90,9 +92,9 @@ export class PopupController {
   }
 
   /* --- Search Trigger --- */
-  public async handleSearch(username: string): void {
+  public async handleSearch(username: string): Promise<void> {
     const cleanUsername = username.trim().replace(/^@/, "");
-    
+
     // Empty submit handling
     if (!cleanUsername) {
       this.showInputErrorCue("Please enter a valid GitHub username");
@@ -104,15 +106,18 @@ export class PopupController {
 
     // Transition to LOADING state
     this.setState("loading");
-    this.updateLoadingUI(cleanUsername);
+    this.updateLoadingUI(this.currentUsername);
 
     try {
       // 1. Fetch User Profile
       this.updateTerminalLog("> Querying GitHub API profile endpoint...");
-      
+
       let profile: GitHubUserProfile | null = null;
 
-      if (typeof chrome !== "undefined" && chrome.runtime?.sendMessage) {
+      if (
+        typeof chrome !== "undefined" &&
+        typeof chrome.runtime?.sendMessage === "function"
+      ) {
         const response = await this.sendExtensionMessage({
           type: "FETCH_USER_PROFILE",
           payload: { username: cleanUsername },
@@ -139,10 +144,15 @@ export class PopupController {
       }
 
       // 2. Fetch User Repos for language analysis
-      this.updateTerminalLog("> Fetching repository manifests & top languages...");
-      
+      this.updateTerminalLog(
+        "> Fetching repository manifests & top languages...",
+      );
+
       let repos: GitHubRepository[] = [];
-      if (typeof chrome !== "undefined" && chrome.runtime?.sendMessage) {
+      if (
+        typeof chrome !== "undefined" &&
+        typeof chrome.runtime?.sendMessage === "function"
+      ) {
         try {
           const repoResponse = await this.sendExtensionMessage({
             type: "FETCH_USER_REPOS",
@@ -158,7 +168,6 @@ export class PopupController {
 
       // Transition to SUCCESS state
       this.renderSuccessProfile(profile, repos);
-
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : String(err);
       this.renderErrorState(errorMessage, cleanUsername);
@@ -181,7 +190,10 @@ export class PopupController {
   }
 
   /* --- Success Rendering --- */
-  private renderSuccessProfile(profile: GitHubUserProfile, repos: GitHubRepository[]): void {
+  private renderSuccessProfile(
+    profile: GitHubUserProfile,
+    repos: GitHubRepository[],
+  ): void {
     const avatar = document.getElementById("user-avatar") as HTMLImageElement;
     const name = document.getElementById("user-name");
     const bio = document.getElementById("user-bio");
@@ -192,10 +204,14 @@ export class PopupController {
     const followersEl = document.getElementById("stat-followers");
     const starsEl = document.getElementById("stat-stars");
 
-    const githubLink = document.getElementById("btn-github-profile") as HTMLAnchorElement;
+    const githubLink = document.getElementById(
+      "btn-github-profile",
+    ) as HTMLAnchorElement;
 
     if (avatar) {
-      avatar.src = profile.avatarUrl || `https://avatars.githubusercontent.com/${profile.username}`;
+      avatar.src =
+        profile.avatarUrl ||
+        `https://avatars.githubusercontent.com/${profile.username}`;
     }
     if (name) {
       name.textContent = profile.name || profile.username;
@@ -213,15 +229,24 @@ export class PopupController {
       }
     }
 
-    if (reposEl) reposEl.textContent = this.formatNumber(profile.publicRepos || 0);
-    if (followersEl) followersEl.textContent = this.formatNumber(profile.followers || 0);
+    if (reposEl)
+      reposEl.textContent = this.formatNumber(profile.publicRepos || 0);
+    if (followersEl)
+      followersEl.textContent = this.formatNumber(profile.followers || 0);
 
     // Calculate total stars from fetched repos or estimate
-    const totalStars = repos.reduce((sum, r) => sum + (r.stargazersCount || 0), 0);
-    if (starsEl) starsEl.textContent = this.formatNumber(totalStars > 0 ? totalStars : (profile.publicRepos * 3));
+    const totalStars = repos.reduce(
+      (sum, r) => sum + (r.stargazersCount || 0),
+      0,
+    );
+    if (starsEl)
+      starsEl.textContent = this.formatNumber(
+        totalStars > 0 ? totalStars : profile.publicRepos * 3,
+      );
 
     if (githubLink) {
-      githubLink.href = profile.htmlUrl || `https://github.com/${profile.username}`;
+      githubLink.href =
+        profile.htmlUrl || `https://github.com/${profile.username}`;
     }
 
     // Render Top Languages
@@ -267,7 +292,8 @@ export class PopupController {
     if (langBar) {
       langBar.innerHTML = stats
         .map(
-          (s) => `<div class="lang-segment" style="width: ${s.percentage}%; background-color: ${s.color};" title="${s.name}: ${s.percentage}%"></div>`
+          (s) =>
+            `<div class="lang-segment" style="width: ${s.percentage}%; background-color: ${s.color};" title="${s.name}: ${s.percentage}%"></div>`,
         )
         .join("");
     }
@@ -275,7 +301,8 @@ export class PopupController {
     if (langLegend) {
       langLegend.innerHTML = stats
         .map(
-          (s) => `<span class="lang-item"><span class="lang-dot" style="background-color: ${s.color};"></span> ${s.name}</span>`
+          (s) =>
+            `<span class="lang-item"><span class="lang-dot" style="background-color: ${s.color};"></span> ${s.name}</span>`,
         )
         .join("");
     }
@@ -285,7 +312,9 @@ export class PopupController {
   private renderErrorState(rawError: string, username: string): void {
     const errorTitle = document.getElementById("error-title");
     const errorDesc = document.getElementById("error-description");
-    const errorInput = document.getElementById("search-input-error") as HTMLInputElement;
+    const errorInput = document.getElementById(
+      "search-input-error",
+    ) as HTMLInputElement;
     const errorActionBtn = document.getElementById("btn-error-action");
 
     if (errorInput) {
@@ -303,19 +332,27 @@ export class PopupController {
     } else if (lowerErr.includes("rate limit") || lowerErr.includes("403")) {
       if (errorTitle) errorTitle.textContent = "Rate Limit Reached";
       if (errorDesc) {
-        errorDesc.textContent = "GitHub API rate limit exceeded. Authenticate with a PAT in settings for higher limits.";
+        errorDesc.textContent =
+          "GitHub API rate limit exceeded. Authenticate with a PAT in settings for higher limits.";
       }
       if (errorActionBtn) errorActionBtn.textContent = "OPEN SETTINGS \u2192";
-    } else if (lowerErr.includes("network") || lowerErr.includes("failed to fetch") || !navigator.onLine) {
+    } else if (
+      lowerErr.includes("network") ||
+      lowerErr.includes("failed to fetch") ||
+      !navigator.onLine
+    ) {
       if (errorTitle) errorTitle.textContent = "Connection Error";
       if (errorDesc) {
-        errorDesc.textContent = "Network request failed. Please check your internet connection and try again.";
+        errorDesc.textContent =
+          "Network request failed. Please check your internet connection and try again.";
       }
       if (errorActionBtn) errorActionBtn.textContent = "RETRY SEARCH \u2192";
     } else {
       if (errorTitle) errorTitle.textContent = "Unable to Fetch Profile";
       if (errorDesc) {
-        errorDesc.textContent = rawError || "An unexpected error occurred while communicating with GitHub.";
+        errorDesc.textContent =
+          rawError ||
+          "An unexpected error occurred while communicating with GitHub.";
       }
       if (errorActionBtn) errorActionBtn.textContent = "RETRY \u2192";
     }
@@ -366,18 +403,26 @@ export class PopupController {
     });
 
     // Initial Search Form
-    const initialForm = document.getElementById("search-form-initial") as HTMLFormElement;
+    const initialForm = document.getElementById(
+      "search-form-initial",
+    ) as HTMLFormElement;
     initialForm?.addEventListener("submit", (e) => {
       e.preventDefault();
-      const input = document.getElementById("search-input-initial") as HTMLInputElement;
+      const input = document.getElementById(
+        "search-input-initial",
+      ) as HTMLInputElement;
       this.handleSearch(input?.value || "");
     });
 
     // Error Search Form
-    const errorForm = document.getElementById("search-form-error") as HTMLFormElement;
+    const errorForm = document.getElementById(
+      "search-form-error",
+    ) as HTMLFormElement;
     errorForm?.addEventListener("submit", (e) => {
       e.preventDefault();
-      const input = document.getElementById("search-input-error") as HTMLInputElement;
+      const input = document.getElementById(
+        "search-input-error",
+      ) as HTMLInputElement;
       const title = document.getElementById("error-title")?.textContent || "";
       if (title === "Rate Limit Reached") {
         if (typeof chrome !== "undefined" && chrome.runtime?.openOptionsPage) {
@@ -389,40 +434,52 @@ export class PopupController {
     });
 
     // Quick Try Link (octocat)
-    document.getElementById("btn-try-octocat")?.addEventListener("click", () => {
-      const input = document.getElementById("search-input-initial") as HTMLInputElement;
-      if (input) input.value = "octocat";
-      this.handleSearch("octocat");
-    });
+    document
+      .getElementById("btn-try-octocat")
+      ?.addEventListener("click", () => {
+        const input = document.getElementById(
+          "search-input-initial",
+        ) as HTMLInputElement;
+        if (input) input.value = "octocat";
+        this.handleSearch("octocat");
+      });
 
     // Abort Sequence Button
-    document.getElementById("btn-abort-sequence")?.addEventListener("click", () => {
-      this.setState("initial");
-      this.showToast("Search sequence cancelled");
-    });
+    document
+      .getElementById("btn-abort-sequence")
+      ?.addEventListener("click", () => {
+        this.setState("initial");
+        this.showToast("Search sequence cancelled");
+      });
 
     // Search another username link
-    document.getElementById("btn-search-another")?.addEventListener("click", () => {
-      this.setState("initial");
-    });
+    document
+      .getElementById("btn-search-another")
+      ?.addEventListener("click", () => {
+        this.setState("initial");
+      });
 
     // Reset from error view back to initial
-    document.getElementById("btn-error-reset")?.addEventListener("click", () => {
-      this.setState("initial");
-    });
+    document
+      .getElementById("btn-error-reset")
+      ?.addEventListener("click", () => {
+        this.setState("initial");
+      });
 
     // Explore in Side Panel button
-    document.getElementById("btn-sidepanel-explore")?.addEventListener("click", () => {
-      if (typeof chrome !== "undefined" && chrome.sidePanel?.open) {
-        chrome.windows.getCurrent((win) => {
-          if (win.id) {
-            chrome.sidePanel.open({ windowId: win.id });
-          }
-        });
-      } else {
-        this.showToast("Opening side panel...");
-      }
-    });
+    document
+      .getElementById("btn-sidepanel-explore")
+      ?.addEventListener("click", () => {
+        if (typeof chrome !== "undefined" && chrome.sidePanel?.open) {
+          chrome.windows.getCurrent((win) => {
+            if (win.id) {
+              chrome.sidePanel.open({ windowId: win.id });
+            }
+          });
+        } else {
+          this.showToast("Opening side panel...");
+        }
+      });
 
     // Footer Navigation Tabs
     document.getElementById("nav-btn-search")?.addEventListener("click", () => {
@@ -432,23 +489,27 @@ export class PopupController {
       }
     });
 
-    document.getElementById("nav-btn-history")?.addEventListener("click", () => {
-      this.setNavActive("nav-btn-history");
-      if (typeof chrome !== "undefined" && chrome.runtime?.openOptionsPage) {
-        chrome.runtime.openOptionsPage();
-      } else {
-        this.showToast("History opened in Settings");
-      }
-    });
+    document
+      .getElementById("nav-btn-history")
+      ?.addEventListener("click", () => {
+        this.setNavActive("nav-btn-history");
+        if (typeof chrome !== "undefined" && chrome.runtime?.openOptionsPage) {
+          chrome.runtime.openOptionsPage();
+        } else {
+          this.showToast("History opened in Settings");
+        }
+      });
 
-    document.getElementById("nav-btn-settings")?.addEventListener("click", () => {
-      this.setNavActive("nav-btn-settings");
-      if (typeof chrome !== "undefined" && chrome.runtime?.openOptionsPage) {
-        chrome.runtime.openOptionsPage();
-      } else {
-        this.showToast("Opening Settings...");
-      }
-    });
+    document
+      .getElementById("nav-btn-settings")
+      ?.addEventListener("click", () => {
+        this.setNavActive("nav-btn-settings");
+        if (typeof chrome !== "undefined" && chrome.runtime?.openOptionsPage) {
+          chrome.runtime.openOptionsPage();
+        } else {
+          this.showToast("Opening Settings...");
+        }
+      });
 
     // Documentation / Changelog links
     document.getElementById("link-docs")?.addEventListener("click", (e) => {
@@ -458,16 +519,20 @@ export class PopupController {
       }
     });
 
-    document.getElementById("link-changelog")?.addEventListener("click", (e) => {
-      e.preventDefault();
-      if (typeof chrome !== "undefined" && chrome.runtime?.openOptionsPage) {
-        chrome.runtime.openOptionsPage();
-      }
-    });
+    document
+      .getElementById("link-changelog")
+      ?.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (typeof chrome !== "undefined" && chrome.runtime?.openOptionsPage) {
+          chrome.runtime.openOptionsPage();
+        }
+      });
   }
 
   private setNavActive(btnId: string): void {
-    document.querySelectorAll(".nav-tab").forEach((tab) => tab.classList.remove("active"));
+    document
+      .querySelectorAll(".nav-tab")
+      .forEach((tab) => tab.classList.remove("active"));
     document.getElementById(btnId)?.classList.add("active");
   }
 }
