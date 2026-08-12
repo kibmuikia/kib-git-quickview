@@ -1,4 +1,5 @@
 /// <reference types="chrome" />
+// file: src/types/messages.ts
 
 export interface ExtensionSettings {
   pat?: string;
