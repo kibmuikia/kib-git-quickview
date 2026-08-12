@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Git Quickview Options</title>
+    <title>Git Quickview Settings & Config</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -13,11 +13,245 @@
       rel="stylesheet"
     />
 
-    <link rel="stylesheet" href="../src/options/options.css" />
   </head>
   <body>
-    <div id="app" class="options-container">
-        
+    <div id="app" class="options-layout">
+      <!-- Sidebar Navigation -->
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-logo">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path>
+              <path d="M9 18c-4.51 2-5-2-7-2"></path>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <span class="brand-title">Git Quickview</span>
+            <span class="brand-badge">v1.0.0</span>
+          </div>
+        </div>
+
+        <nav class="nav-menu">
+          <a href="#settings" class="nav-item active" data-tab="settings">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            General Settings
+          </a>
+          <a href="#about" class="nav-item" data-tab="about">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            About & Profile
+          </a>
+          <a href="#faq" class="nav-item" data-tab="faq">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            FAQ & Docs
+          </a>
+        </nav>
+
+        <div class="sidebar-footer">
+          <div class="rate-limit-card">
+            <div class="rate-limit-header">
+              <span>API Rate Limit</span>
+              <span id="rate-limit-count">--/--</span>
+            </div>
+            <div class="progress-bar">
+              <div id="rate-limit-bar" class="progress-fill" style="width: 0%"></div>
+            </div>
+            <span id="rate-limit-reset" class="reset-time">Reset: --</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="main-content">
+        <!-- Toast Container -->
+        <div id="toast-container" class="toast-container"></div>
+
+        <!-- Section: General Settings -->
+        <section id="tab-settings" class="tab-section active">
+          <header class="section-header">
+            <h2>General Settings</h2>
+            <p>Configure API access, caching strategies, and appearance defaults.</p>
+          </header>
+
+          <form id="settings-form" class="settings-form">
+            <!-- Token Setting -->
+            <div class="card setting-card">
+              <div class="setting-info">
+                <label for="pat-input" class="setting-title">GitHub Personal Access Token (PAT)</label>
+                <p class="setting-desc">
+                  Increases rate limit from 60 to 5,000 requests/hour and unlocks private repository visibility.
+                </p>
+              </div>
+              <div class="setting-control vertical">
+                <div class="input-group">
+                  <input
+                    type="password"
+                    id="pat-input"
+                    placeholder="github_pat_11..."
+                    autocomplete="off"
+                    spellcheck="false"
+                  />
+                  <button type="button" id="btn-toggle-pat" class="btn-icon" title="Toggle Visibility">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                  </button>
+                </div>
+                <span class="input-hint">Requires <code>read:user</code> and <code>repo</code> permissions. Stored locally via extension options.</span>
+              </div>
+            </div>
+
+            <!-- Theme Setting -->
+            <div class="card setting-card">
+              <div class="setting-info">
+                <span class="setting-title">Appearance Theme</span>
+                <p class="setting-desc">Choose your preferred visual presentation mode across extension views.</p>
+              </div>
+              <div class="setting-control">
+                <div class="theme-picker">
+                  <label class="theme-option">
+                    <input type="radio" name="theme" value="dark" />
+                    <span class="theme-card">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                      Dark
+                    </span>
+                  </label>
+                  <label class="theme-option">
+                    <input type="radio" name="theme" value="light" />
+                    <span class="theme-card">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                      Light
+                    </span>
+                  </label>
+                  <label class="theme-option">
+                    <input type="radio" name="theme" value="system" />
+                    <span class="theme-card">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                      System
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Cache TTL Setting -->
+            <div class="card setting-card">
+              <div class="setting-info">
+                <label for="cache-ttl-input" class="setting-title">Cache Expiry (Minutes)</label>
+                <p class="setting-desc">Duration to cache user profile and repository query results locally.</p>
+              </div>
+              <div class="setting-control">
+                <input type="number" id="cache-ttl-input" min="1" max="1440" class="number-input" />
+              </div>
+            </div>
+
+            <!-- Storage Maintenance -->
+            <div class="card setting-card">
+              <div class="setting-info">
+                <span class="setting-title">Storage Maintenance</span>
+                <p class="setting-desc">Flush cached API responses and stored state instantly.</p>
+              </div>
+              <div class="setting-control">
+                <button type="button" id="btn-clear-cache" class="btn-secondary danger">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                  Clear Cache
+                </button>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn-primary">Save Settings</button>
+            </div>
+          </form>
+        </section>
+
+        <!-- Section: About & Git Profile -->
+        <section id="tab-about" class="tab-section">
+          <header class="section-header">
+            <h2>About & Profile</h2>
+            <p>Extension info, developer details, and repository shortcuts.</p>
+          </header>
+
+          <div class="about-grid">
+            <div class="card profile-hero">
+              <div class="hero-content">
+                <div class="hero-badge">Developer Profile</div>
+                <h3>Kibuthi Allan</h3>
+                <p class="hero-handle">@kibmuikia</p>
+                <p class="hero-bio">
+                  Software engineer & creator of Kib-Git-Quickview. Building streamlined developer tooling for GitHub workflows.
+                </p>
+                <div class="hero-links">
+                  <a href="https://github.com/kibmuikia" target="_blank" rel="noopener noreferrer" class="btn-link">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path></svg>
+                    GitHub Profile
+                  </a>
+                  <a href="https://github.com/kibmuikia/kib-git-quickview" target="_blank" rel="noopener noreferrer" class="btn-link secondary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                    Source Repository
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div class="card meta-card">
+              <h4>Extension Meta</h4>
+              <ul class="meta-list">
+                <li><span>Extension Name:</span> <strong>Kib-Git-Quickview</strong></li>
+                <li><span>Version:</span> <strong>1.0.0</strong></li>
+                <li><span>Architecture:</span> <strong>Manifest V3 (Service Worker)</strong></li>
+                <li><span>Theme Engine:</span> <strong>Solar Car Interior</strong></li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section: FAQ & Docs -->
+        <section id="tab-faq" class="tab-section">
+          <header class="section-header">
+            <h2>Frequently Asked Questions</h2>
+            <p>Common answers and troubleshooting tips for extension operations.</p>
+          </header>
+
+          <div class="faq-list">
+            <details class="card faq-item" open>
+              <summary class="faq-question">Why should I configure a GitHub Personal Access Token?</summary>
+              <div class="faq-answer">
+                <p>
+                  Unauthenticated requests to the GitHub REST API are limited to 60 queries per hour per IP. Providing a PAT raises this limit to 5,000 queries per hour and enables searching private repositories you own or collaborate on.
+                </p>
+              </div>
+            </details>
+
+            <details class="card faq-item">
+              <summary class="faq-question">How is data communicated with the background worker?</summary>
+              <div class="faq-answer">
+                <p>
+                  This option view does not read or mutate <code>chrome.storage</code> directly. All actions send asynchronous message payloads (<code>GET_SETTINGS</code>, <code>SAVE_SETTINGS</code>, <code>CLEAR_CACHE</code>) over the runtime message bus to the service worker (<code>background/index.ts</code>).
+                </p>
+              </div>
+            </details>
+
+            <details class="card faq-item">
+              <summary class="faq-question">How does theme sync work between Popup and Options?</summary>
+              <div class="faq-answer">
+                <p>
+                  When you save a theme preference ('dark', 'light', or 'system'), the setting is persisted via background service worker. The HTML document root (<code>&lt;html data-theme="..."&gt;</code>) immediately reflects the updated theme token across all open extension views.
+                </p>
+              </div>
+            </details>
+
+            <details class="card faq-item">
+              <summary class="faq-question">Where can I report a bug or suggest a feature?</summary>
+              <div class="faq-answer">
+                <p>
+                  You can open an issue or feature proposal directly on the <a href="https://github.com/kibmuikia/kib-git-quickview/issues" target="_blank" rel="noopener noreferrer">GitHub Repository Issues page</a>.
+                </p>
+              </div>
+            </details>
+          </div>
+        </section>
+      </main>
+    </div>
+
     <script type="module" src="../src/options/index.ts"></script>
   </body>
 </html>
+

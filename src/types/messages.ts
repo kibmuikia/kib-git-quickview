@@ -1,6 +1,8 @@
 /// <reference types="chrome" />
 // file: src/types/messages.ts
 
+/* Domain types — plain data shapes */
+
 export interface ExtensionSettings {
   pat?: string;
   theme: 'dark' | 'light' | 'system';
@@ -48,7 +50,9 @@ export type ExtensionMessageType =
   | 'GET_SETTINGS'
   | 'SAVE_SETTINGS'
   | 'CLEAR_CACHE'
-  | 'PING';
+  | 'PING'; // A discriminated union of message types : This is the string literal that acts as the discriminant — the tag TypeScript uses to narrow which shape you're dealing with.
+
+/* One interface per message, each with a type field matching one of those literals */
 
 export interface FetchProfileMessage {
   type: 'FETCH_USER_PROFILE';
@@ -95,11 +99,57 @@ export type ExtensionMessage =
   | GetSettingsMessage
   | SaveSettingsMessage
   | ClearCacheMessage
-  | PingMessage;
+  | PingMessage; // The union that ties it together : This is the key type. Any valid message in your system is one of these seven shapes, and — critically — TypeScript can narrow based on `.type`.
 
 export interface ExtensionResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: string;
   rateLimit?: RateLimitInfo;
-}
+} // A generic response envelope : Every response has the same envelope shape, but data is generic so each handler can return its own payload type.
+
+/* Why the discriminated union matters (this is the whole point):
+- Without it, chrome.runtime.sendMessage<M, R> gives you M = any, R = any — no safety at all. With it, you can narrow in a switch:
+  ```typescript
+  chrome.runtime.onMessage.addListener((message: ExtensionMessage, sender, sendResponse) => {
+  switch (message.type) {
+    case 'FETCH_USER_PROFILE':
+      // TS knows message is FetchProfileMessage here
+      // message.payload.username is valid, message.payload.limit would error
+      fetchProfile(message.payload.username, message.payload.forceRefresh)
+        .then((profile) => sendResponse({ success: true, data: profile } satisfies ExtensionResponse<GitHubUserProfile>))
+        .catch((err) => sendResponse({ success: false, error: String(err) } satisfies ExtensionResponse));
+      return true; // keep channel open for async sendResponse
+
+    case 'FETCH_USER_REPOS':
+      fetchRepos(message.payload.username, message.payload.limit)
+        .then((repos) => sendResponse({ success: true, data: repos } satisfies ExtensionResponse<GitHubRepository[]>))
+        .catch((err) => sendResponse({ success: false, error: String(err) } satisfies ExtensionResponse));
+      return true;
+
+    case 'GET_SETTINGS':
+      getSettings().then((settings) =>
+        sendResponse({ success: true, data: settings } satisfies ExtensionResponse<ExtensionSettings>)
+      );
+      return true;
+
+    case 'PING':
+      sendResponse({ success: true, data: 'pong' } satisfies ExtensionResponse<string>);
+      return false; // synchronous, no need to keep channel open
+
+    // ... other cases
+  }
+  });
+  ```
+  That return true is the classic MV3 gotcha — Chrome closes the message channel immediately unless the listener returns true to signal "I'll call sendResponse asynchronously."
+*/
+
+export interface MessageResponseMap {
+  FETCH_USER_PROFILE: ExtensionResponse<GitHubUserProfile>;
+  FETCH_USER_REPOS: ExtensionResponse<GitHubRepository[]>;
+  GET_RATE_LIMIT: ExtensionResponse<RateLimitInfo>;
+  GET_SETTINGS: ExtensionResponse<ExtensionSettings>;
+  SAVE_SETTINGS: ExtensionResponse<void>;
+  CLEAR_CACHE: ExtensionResponse<void>;
+  PING: ExtensionResponse<string>;
+} // If you want end-to-end safety (send FetchProfileMessage, get back ExtensionResponse<GitHubUserProfile> inferred automatically), you'd build a mapped type linking each message type to its response type
