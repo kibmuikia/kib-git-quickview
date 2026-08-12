@@ -1,3 +1,4 @@
+// file: src/popup/index.ts
 import { PopupController } from './popup.ts';
 
 document.addEventListener('DOMContentLoaded', () => {

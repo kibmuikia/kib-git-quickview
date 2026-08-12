@@ -1,5 +1,5 @@
 /// <reference types="chrome" />
-
+// file: src/popup/popup.ts
 /**
  * GitQuickView — Extension Popup Dashboard Controller
  */
