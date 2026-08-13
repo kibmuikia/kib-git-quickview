@@ -1,4 +1,5 @@
 /// <reference types="chrome" />
+// file: src/background/storage.ts
 
 import type { ExtensionSettings, RateLimitInfo } from '../types/messages.ts';
 
