@@ -29,23 +29,30 @@ if (chrome.sidePanel?.setPanelBehavior) {
   chrome.sidePanel
     .setPanelBehavior({ openPanelOnActionClick: false })
     .catch((err: unknown) => {
-      console.warn("[KGQ-BG] Error configuring sidePanel behavior:", err);
+      logger.warn("Error configuring sidePanel behavior", {
+        module: LOG_MODULE,
+        data: { error: err },
+      });
     });
 }
 
 chrome.runtime.onInstalled.addListener(
   (details: chrome.runtime.InstalledDetails) => {
-    console.debug(
-      `[KGQ-BG] Extension installed/updated. Reason: ${details.reason}`,
-    );
+    logger.debug("Extension installed/updated", {
+      module: LOG_MODULE,
+      data: { reason: details.reason },
+    });
     getSettings().catch((err) =>
-      console.error("[KGQ-BG] Failed reading settings on install:", err),
+      logger.error("Failed reading settings on install", {
+        module: LOG_MODULE,
+        data: { error: err },
+      }),
     );
   },
 );
 
 chrome.runtime.onStartup.addListener(() => {
-  console.debug("[KGQ-BG] Service worker started.");
+  logger.debug("Service worker started.", { module: LOG_MODULE });
 });
 
 // --- Runtime Message Relay Bus ---
@@ -108,6 +115,10 @@ chrome.runtime.onMessage.addListener(
         githubService
           .fetchUserRepos(username, limit, forceRefresh)
           .then(({ repos, rateLimit }) => {
+            logger.debug("Fetched user repos successfully", {
+              module: LOG_MODULE,
+              data: repos,
+            });
             sendResponse({ success: true, data: repos, rateLimit });
           })
           .catch((err: Error) => {
@@ -190,9 +201,10 @@ chrome.runtime.onMessage.addListener(
       }
 
       default: {
-        console.warn(
-          `[KGQ-BG] Unhandled message type: ${(message as { type: string }).type}`,
-        );
+        logger.warn("Unhandled message type", {
+          module: LOG_MODULE,
+          data: { messageType: (message as { type: string }).type },
+        });
         sendResponse({ success: false, error: "Unknown message type" });
         return false;
       }
