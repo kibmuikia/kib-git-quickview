@@ -7,8 +7,42 @@ and this project adheres to [Semantic Versioning 2.0.0](https://semver.org/spec/
 
 ## [Unreleased]
 
-Project is pre-release (`0.0.1`, unpublished, no tags cut yet). All work to date
-is tracked here until the first published version.
+## [0.0.2] - 2026-08-13
+
+Project is pre-release and unpublished; no tags have been cut yet, so this
+section is provisional and keyed to the version bump commit rather than a
+GitHub release.
+
+### Added
+- Domain-specific GitHub API error hierarchy in `src/lib/github/types.ts`:
+  a `GitHubServiceError` base class plus `GitHubNotFoundError`,
+  `GitHubAuthError`, `GitHubRateLimitError`, `GitHubNetworkError`,
+  `GitHubTimeoutError`, `GitHubParseError`, and `GitHubApiError` for
+  targeted client-side branching.
+- Request timeout handling via `fetchWithTimeout()`, using `AbortController`
+  to convert DOM/network aborts into typed network or timeout errors
+  (default 10s, via `DEFAULT_TIMEOUT_MS`).
+- Structured logging via a central `logger` utility, wired into background
+  message handlers and the popup runtime, with debug/error logs for
+  `FETCH_USER_PROFILE`, `FETCH_USER_REPOS`, rate-limiting, and settings
+  persistence.
+- `IS_DEV_MODE` flag exported from `src/lib/constants.ts`.
+- `CHANGELOG.md`.
+
+### Changed
+- Hardened `github-service.ts`: `parseJson()` now gracefully handles empty
+  bodies (204/304) and non-JSON error pages; `assertOk()` centralizes status
+  handling for 401/403/404, rate-limit header extraction
+  (`x-ratelimit-reset`, `retry-after`), and secondary rate-limit (abuse)
+  detection.
+- Wrapped settings and cache reads/writes in non-blocking try-catch blocks so
+  local storage failures no longer break network requests.
+- Updated `public/options.html` branding to "Kib Git Quickview".
+- Updated `README.md` and the `package.json` description with current
+  project data.
+- Bumped version to `0.0.2`.
+
+## [0.0.1]
 
 ### Added
 - Manifest V3 schema and permissions configuration for the Chrome extension.
@@ -60,4 +94,6 @@ is tracked here until the first published version.
 ### Removed
 - `public/manifest.json` (superseded by `src/manifest.config.ts`).
 
-[Unreleased]: https://github.com/kibmuikia/kib-git-quickview/commits/main
+[Unreleased]: https://github.com/kibmuikia/kib-git-quickview/compare/570adc5...HEAD
+[0.0.2]: https://github.com/kibmuikia/kib-git-quickview/compare/653bcea...570adc5
+[0.0.1]: https://github.com/kibmuikia/kib-git-quickview/commits/653bcea
