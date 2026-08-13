@@ -3,6 +3,7 @@
 
 export const GITHUB_API_BASE = "https://api.github.com";
 export const DEFAULT_TIMEOUT_MS = 10_000;
+export const GITHUB_USERNAME_RE = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 
 /* Typed errors
 - Every failure mode a caller might want to branch on (show a "not found" state vs. a "rate limited, retry at X" banner vs. a generic error toast)
@@ -80,5 +81,19 @@ export class GitHubApiError extends GitHubServiceError {
       cause,
     });
     this.name = "GitHubApiError";
+  }
+}
+
+/* --- Assert valid Github username */
+export function assertValidGithubUsername(username: string): void {
+  if (username.length < 1) {
+    throw new GitHubServiceError("A GitHub username is required.");
+  }
+  if (!GITHUB_USERNAME_RE.test(username)) {
+    throw new GitHubServiceError(
+      `'${username}' is not a valid GitHub username. ` +
+        `Usernames must be 1–39 characters, contain only alphanumeric characters ` +
+        `or single internal hyphens, and cannot start or end with a hyphen.`,
+    );
   }
 }
