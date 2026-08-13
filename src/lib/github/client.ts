@@ -1,5 +1,6 @@
 // file: src/lib/github/client.ts
-import { getSettings, saveRateLimit } from "../../background/storage.ts";
+import { getSettings } from "../../lib/storage/settings.ts";
+import { saveRateLimit } from "../../lib/storage/rate-limit.ts";
 import { logger } from "../logger.ts";
 import type { RateLimitInfo } from "../../types/messages.ts";
 import {

@@ -15,9 +15,9 @@ import { githubService } from "./github-service.ts";
 import {
   getSettings,
   saveSettings,
-  getRateLimit,
-  clearCache,
-} from "./storage.ts";
+} from "../lib/storage/settings.ts";
+import { getRateLimit } from "../lib/storage/rate-limit.ts";
+import { clearCache } from "../lib/cache/cache.ts";
 import { logger } from "../lib/logger.ts";
 
 const LOG_MODULE = "KGQ-BG";
