@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#30343B"/>
+      <stop offset="1" stop-color="#0F1216"/>
+    </linearGradient>
+    <linearGradient id="needle" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#C41E12"/>
+      <stop offset="0.55" stop-color="#E8331A"/>
+      <stop offset="1" stop-color="#FC4420"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="7" stdDeviation="7" flood-opacity=".25"/>
+    </filter>
+  </defs>
+
+  <!-- Outer dashboard ring -->
+  <path d="M 512 99
+           A 413 413 0 1 1 511.9 99"
+        fill="none"
+        stroke="url(#ring)"
+        stroke-width="78"
+        stroke-linecap="round"/>
+
+  <!-- Lower Y-shaped dashboard branches (bezier-fit to reference geometry) -->
+  <path d="M 158 494
+           C 318 567, 491 678, 512 872"
+        fill="none"
+        stroke="url(#ring)"
+        stroke-width="76"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+
+  <path d="M 866 494
+           C 706 567, 533 678, 512 872"
+        fill="none"
+        stroke="url(#ring)"
+        stroke-width="76"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+
+  <!-- Needle -->
+  <g filter="url(#shadow)">
+    <path d="M 506 501
+             L 759 264
+             Q 774 250 787 263
+             Q 798 275 785 290
+             L 550 540
+             Z"
+          fill="url(#needle)"/>
+    <circle cx="506" cy="501" r="76" fill="url(#needle)"/>
+    <circle cx="506" cy="501" r="68" fill="none" stroke="#FF7D5C" stroke-opacity=".3" stroke-width="5"/>
+  </g>
+</svg>
