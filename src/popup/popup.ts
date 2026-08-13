@@ -2,7 +2,8 @@
 // file: src/popup/popup.ts
 
 import "./popup.css";
-
+import { LOGO_PNG_URL } from "../lib/constants";
+import { setLogo } from "../lib/utils";
 import type {
   ExtensionMessage,
   MessageResponseMap,
@@ -30,6 +31,7 @@ export class PopupController {
     this.initTheme();
     this.bindEvents();
     this.setState("initial");
+    this.setLogo();
   }
 
   /* --- Extension Message Helper --- */
@@ -89,6 +91,11 @@ export class PopupController {
     if (main) {
       main.setAttribute("data-state", state);
     }
+  }
+
+  /* --- Set logo --- */
+  public setLogo(): void {
+    setLogo(LOGO_PNG_URL);
   }
 
   /* --- Search Trigger --- */

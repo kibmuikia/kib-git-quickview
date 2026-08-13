@@ -43,6 +43,15 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* --- Util classes --- */
+.hidden {
+  display: none !important;
+}
+.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
 /* ---- Brand lockup (popup header + options sidebar) ---- */
 .brand {
   display: flex;

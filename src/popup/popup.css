@@ -36,6 +36,11 @@ body {
   position: relative;
 }
 
+/* #logo-img,
+#logo-svg {
+  transition: opacity 150ms ease;
+} */
+
 /* --- Toast placement (popup positions the shared .toast-container) --- */
 .toast-container {
   position: absolute;

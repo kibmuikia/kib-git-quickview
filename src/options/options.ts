@@ -10,6 +10,8 @@ import {
   ClearCacheMessage,
   GetRateLimitMessage,
 } from "../types/messages";
+import { LOGO_PNG_URL } from "../lib/constants";
+import { setLogo } from "../lib/utils";
 
 export class OptionsController {
   private form = document.getElementById("settings-form") as HTMLFormElement;
@@ -42,6 +44,7 @@ export class OptionsController {
     this.initEventListeners();
     this.loadSettings();
     this.loadRateLimit();
+    this.setLogo();
   }
 
   /* private async sendMessage<T>(message: ExtensionMessage): Promise<T> {
@@ -202,6 +205,11 @@ export class OptionsController {
     } catch {
       this.showToast("Failed to request cache clear.", "error");
     }
+  }
+
+  /* --- Set logo --- */
+  public setLogo(): void {
+    setLogo(LOGO_PNG_URL);
   }
 
   private async loadRateLimit(): Promise<void> {
