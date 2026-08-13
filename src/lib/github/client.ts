@@ -46,6 +46,14 @@ export class GitHubClient {
       resetTime: parseInt(reset, 10),
     };
 
+    if (
+      !Number.isFinite(rateLimitInfo.limit) ||
+      !Number.isFinite(rateLimitInfo.remaining) ||
+      !Number.isFinite(rateLimitInfo.resetTime)
+    ) {
+      return null;
+    }
+
     saveRateLimit(rateLimitInfo).catch((err: unknown) => {
       logger.warn("Failed to persist rate limit info.", {
         module: LOG_MODULE,
