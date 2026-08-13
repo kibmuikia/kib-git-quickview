@@ -63,7 +63,7 @@ chrome.runtime.onMessage.addListener(
     _sender: chrome.runtime.MessageSender,
     sendResponse: (response: ExtensionResponse) => void,
   ): boolean => {
-    logger.debug("Received message", { module: LOG_MODULE, data: message });
+    logger.debug("Received message: ", { module: LOG_MODULE, data: message });
     if (!message || typeof message !== "object") {
       sendResponse({ success: false, error: "Invalid message payload" });
       return false;
@@ -86,7 +86,10 @@ chrome.runtime.onMessage.addListener(
           .then(({ profile, rateLimit }) => {
             logger.debug("Fetched user profile successfully", {
               module: LOG_MODULE,
-              data: profile,
+              data: {
+                profileData: profile,
+                rateLimitData: rateLimit,
+              },
             });
             sendResponse({ success: true, data: profile, rateLimit });
           })
@@ -117,7 +120,10 @@ chrome.runtime.onMessage.addListener(
           .then(({ repos, rateLimit }) => {
             logger.debug("Fetched user repos successfully", {
               module: LOG_MODULE,
-              data: repos,
+              data: {
+                reposData: repos,
+                rateLimitData: rateLimit,
+              },
             });
             sendResponse({ success: true, data: repos, rateLimit });
           })
@@ -167,6 +173,10 @@ chrome.runtime.onMessage.addListener(
       case "SAVE_SETTINGS": {
         saveSettings(message.payload || {})
           .then((updatedSettings) => {
+            logger.debug("Settings saved successfully", {
+              module: LOG_MODULE,
+              data: updatedSettings,
+            });
             sendResponse({ success: true, data: updatedSettings });
           })
           .catch((err: Error) => {
