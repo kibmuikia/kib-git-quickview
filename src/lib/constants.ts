@@ -8,3 +8,4 @@ import logoSvgUrl from "../assets/kib-git-quickview-logo.svg";
 export const LOGO_PNG_URL = logoPngUrl;
 export const LOGO_RINGED_PNG_URL = logoRingedPngUrl;
 export const LOGO_SVG_URL = logoSvgUrl;
+export const IS_DEV_MODE = import.meta.env.DEV;

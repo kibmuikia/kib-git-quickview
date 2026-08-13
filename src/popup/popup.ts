@@ -10,6 +10,7 @@ import type {
   GitHubUserProfile,
   GitHubRepository,
 } from "../types/messages";
+import { logger } from "../lib/logger.ts";
 
 export type PopupState = "initial" | "loading" | "success" | "error";
 export type ThemeMode = "dark" | "light" | "system";
