@@ -14,6 +14,7 @@ Your GitHub lookup, minus the tab switching — quick developer profile snapshot
 ![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6)
 ![Vite](https://img.shields.io/badge/Vite-8-646CFF)
 ![pnpm](https://img.shields.io/badge/pnpm-workspace-F69220)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
 
