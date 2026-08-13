@@ -1,8 +1,14 @@
 # kib-git-quickview
 
-> Turn any GitHub username into a compact developer dashboard — right from your browser toolbar.
+> Your GitHub lookup, minus the tab switching.
 
-A Chrome extension (Manifest V3) that surfaces repo count, latest repositories, public activity, and top languages for any GitHub user in one click, without leaving the page you're on.
+> Chrome extension for quick GitHub developer profile lookups.
+
+> A Chrome extension that displays GitHub user stats in a popup + side-panel dashboard.
+
+> One click. Any GitHub user. Full snapshot.
+
+Your GitHub lookup, minus the tab switching — quick developer profile snapshots, popup or side panel.
 
 ![Manifest V3](https://img.shields.io/badge/Manifest-V3-blue)
 ![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6)

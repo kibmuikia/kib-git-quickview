@@ -8,7 +8,7 @@ export default defineManifest(async () => ({
   manifest_version: 3,
   name: "kib-git-quickview",
   description:
-    "A Chrome extension that turns any GitHub username into a compact developer dashboard — repo count, latest repos, public activity, top languages — in one click, without leaving the current page.",
+    "Your GitHub lookup, minus the tab switching — quick developer profile snapshots, popup or side panel.",
   version: `${major}.${minor}.${patch}`,
   version_name: version,
   permissions: ["storage", "sidePanel"],
