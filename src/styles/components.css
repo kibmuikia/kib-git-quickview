@@ -1,0 +1,199 @@
+/* file: src/styles/components.css */
+/* -------------------------------------------------------------------------- */
+/* Shared components — used by both popup and options.                       */
+/* Depends on tokens.generated.css being loaded first.                       */
+/* -------------------------------------------------------------------------- */
+
+:root {
+  /* Accent-rust alias: brand's "single high-signal accent" per the theme's
+     usage guidance. Previously popup.css hardcoded #8b3a16 here, which did
+     not match the sampled rust-terracotta value (#955942) that options.css
+     used correctly. This is now the one place that decision is made. */
+  --accent-rust: var(--rust-terracotta-600);
+  --accent-rust-hover: var(--rust-terracotta-700);
+  --accent-rust-subtle-bg: var(--rust-terracotta-100);
+
+  /* Motion tokens — not part of the color theme JSON, but shared UI behavior */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme="dark"] {
+  --accent-rust: var(--rust-terracotta-500);
+  --accent-rust-hover: var(--rust-terracotta-400);
+  --accent-rust-subtle-bg: var(--rust-terracotta-800);
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-theme="system"] {
+    --accent-rust: var(--rust-terracotta-500);
+    --accent-rust-hover: var(--rust-terracotta-400);
+    --accent-rust-subtle-bg: var(--rust-terracotta-800);
+  }
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---- Brand lockup (popup header + options sidebar) ---- */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brand-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-rust);
+}
+
+.brand-title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--accent-rust);
+  letter-spacing: -0.2px;
+}
+
+/* ---- Icon button (theme toggle, inline actions) ---- */
+.btn-icon {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.btn-icon:hover {
+  background: var(--background-surface-sunken);
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .icon-sun { display: none; }
+[data-theme="dark"] .icon-moon { display: none; }
+
+/* ---- Card base (popup state cards + options settings cards) ---- */
+.card,
+.initial-card,
+.loading-card,
+.summary-card,
+.error-card {
+  background: var(--background-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ---- Buttons ---- */
+.btn-primary,
+.btn-primary-rust {
+  background: var(--accent-rust);
+  color: var(--text-on-accent);
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: background-color 150ms ease;
+}
+
+.btn-primary:hover,
+.btn-primary-rust:hover {
+  background: var(--accent-rust-hover);
+}
+
+.btn-secondary,
+.btn-outline-rust {
+  background: var(--background-surface-raised);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 150ms ease;
+}
+
+.btn-secondary:hover,
+.btn-outline-rust:hover {
+  border-color: var(--accent-rust);
+  color: var(--accent-rust);
+}
+
+.btn-secondary.danger {
+  border-color: var(--rust-terracotta-500);
+  color: var(--accent-rust);
+}
+
+.btn-secondary.danger:hover {
+  background-color: var(--rust-terracotta-500);
+  color: var(--text-on-accent);
+}
+
+/* ---- Toast notifications (popup + options both spawn these) ---- */
+.toast-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 999;
+  pointer-events: none;
+}
+
+.toast {
+  background: var(--background-surface-raised);
+  border: 1px solid var(--border-strong);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  text-align: center;
+  pointer-events: auto;
+  animation: toastSlideIn 200ms ease-out forwards;
+}
+
+@keyframes toastSlideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---- Progress track (popup scan progress + options rate-limit meter) ---- */
+.progress-track {
+  width: 100%;
+  height: 10px;
+  background: var(--background-surface-sunken);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--accent-rust);
+  border-radius: var(--radius-full);
+  transition: width 250ms ease;
+}

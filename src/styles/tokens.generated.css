@@ -1,0 +1,173 @@
+/* ------------------------------------------------------------------------ */
+/* AUTO-GENERATED — DO NOT EDIT DIRECTLY                                     */
+/* Source: solar-car-interior-theme.json (v1.0.0)                */
+/* Regenerate with: node scripts/generate-tokens.mjs                        */
+/* ------------------------------------------------------------------------ */
+
+:root {
+  /* ---- Raw palette scales (rarely used directly — prefer semantic tokens) ---- */
+  --saddle-tan-base: #B8957E;
+  --saddle-tan-50: #F9F5F3;
+  --saddle-tan-100: #F1E9E4;
+  --saddle-tan-200: #E3D4C9;
+  --saddle-tan-300: #D1B8A8;
+  --saddle-tan-400: #BE9B83;
+  --saddle-tan-500: #AB7D5E;
+  --saddle-tan-600: #8D644A;
+  --saddle-tan-700: #6B4C38;
+  --saddle-tan-800: #4A3427;
+  --saddle-tan-900: #2C1F17;
+  --saddle-tan-950: #17110C;
+  --warm-greige-base: #8E7E70;
+  --warm-greige-50: #F7F6F5;
+  --warm-greige-100: #EDEAE8;
+  --warm-greige-200: #DBD6D1;
+  --warm-greige-300: #C5BCB4;
+  --warm-greige-400: #ADA095;
+  --warm-greige-500: #948475;
+  --warm-greige-600: #796A5D;
+  --warm-greige-700: #5C5147;
+  --warm-greige-800: #3F3831;
+  --warm-greige-900: #25211D;
+  --warm-greige-950: #141210;
+  --metal-bronze-base: #918274;
+  --metal-bronze-50: #F7F6F5;
+  --metal-bronze-100: #EDEBE8;
+  --metal-bronze-200: #DBD6D1;
+  --metal-bronze-300: #C5BCB4;
+  --metal-bronze-400: #ADA095;
+  --metal-bronze-500: #948475;
+  --metal-bronze-600: #796B5E;
+  --metal-bronze-700: #5C5147;
+  --metal-bronze-800: #3F3831;
+  --metal-bronze-900: #25211D;
+  --metal-bronze-950: #141210;
+  --ivory-cream-base: #DBCDBA;
+  --ivory-cream-50: #F9F7F3;
+  --ivory-cream-100: #F2ECE4;
+  --ivory-cream-200: #E4D8C8;
+  --ivory-cream-300: #D3C0A6;
+  --ivory-cream-400: #C1A681;
+  --ivory-cream-500: #AE8B5B;
+  --ivory-cream-600: #8F7147;
+  --ivory-cream-700: #6D5636;
+  --ivory-cream-800: #4B3B25;
+  --ivory-cream-900: #2C2316;
+  --ivory-cream-950: #18130C;
+  --charcoal-net-base: #514946;
+  --charcoal-net-50: #F7F6F5;
+  --charcoal-net-100: #ECEAE9;
+  --charcoal-net-200: #D9D5D3;
+  --charcoal-net-300: #C2BAB7;
+  --charcoal-net-400: #A89D99;
+  --charcoal-net-500: #8E807B;
+  --charcoal-net-600: #746763;
+  --charcoal-net-700: #584F4B;
+  --charcoal-net-800: #3D3634;
+  --charcoal-net-900: #24201F;
+  --charcoal-net-950: #131110;
+  --rust-terracotta-base: #8A5641;
+  --rust-terracotta-50: #FAF5F3;
+  --rust-terracotta-100: #F3E7E3;
+  --rust-terracotta-200: #E6CFC6;
+  --rust-terracotta-300: #D6B2A3;
+  --rust-terracotta-400: #C5917C;
+  --rust-terracotta-500: #B47055;
+  --rust-terracotta-600: #955942;
+  --rust-terracotta-700: #714432;
+  --rust-terracotta-800: #4E2F22;
+  --rust-terracotta-900: #2E1C14;
+  --rust-terracotta-950: #190F0B;
+
+  /* ---- Typography ---- */
+  --font-heading: 'Fraunces', 'Georgia', serif;
+  --font-body: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'SFMono-Regular', monospace;
+
+  /* ---- Radii ---- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+  --radius-pill: 999px;
+  --radius-full: 9999px;
+
+  /* ---- Shadow ---- */
+  --shadow-sm: 0 1px 2px rgba(37,33,29,0.08);
+  --shadow-md: 0 4px 10px rgba(37,33,29,0.12);
+  --shadow-lg: 0 12px 28px rgba(37,33,29,0.18);
+
+  /* ---- Feedback (theme-invariant) ---- */
+  --feedback-success: #6E8B5A;
+  --feedback-success-bg: #E8EEE1;
+  --feedback-warning: #B47055;
+  --feedback-warning-bg: #F3E7E3;
+  --feedback-error: #A6493A;
+  --feedback-error-bg: #F6E4E0;
+  --feedback-info: #948475;
+  --feedback-info-bg: #EDEBE8;
+
+  /* ---- Default (light) semantic tokens ---- */
+  --background-canvas: #F9F7F3;
+  --background-surface: #F2ECE4;
+  --background-surface-raised: #FFFFFF;
+  --background-surface-sunken: #EDEAE8;
+  --text-primary: #24201F;
+  --text-secondary: #584F4B;
+  --text-muted: #796A5D;
+  --text-on-accent: #FFFFFF;
+  --text-on-primary: #FFFFFF;
+  --border-default: #C5BCB4;
+  --border-subtle: #D3C0A6;
+  --border-strong: #A89D99;
+  --interactive-primary: #8D644A;
+  --interactive-primary-hover: #6B4C38;
+  --interactive-primary-active: #4A3427;
+  --interactive-secondary: #948475;
+  --interactive-secondary-hover: #796B5E;
+  --interactive-focus-ring: #ADA095;
+}
+
+[data-theme="dark"] {
+  /* ---- Dark semantic token overrides ---- */
+  --background-canvas: #131110;
+  --background-surface: #24201F;
+  --background-surface-raised: #3D3634;
+  --background-surface-sunken: #0D0B0A;
+  --text-primary: #F2ECE4;
+  --text-secondary: #D3C0A6;
+  --text-muted: #ADA095;
+  --text-on-accent: #1A1512;
+  --text-on-primary: #1A1512;
+  --border-default: #584F4B;
+  --border-subtle: #3D3634;
+  --border-strong: #796A5D;
+  --interactive-primary: #BE9B83;
+  --interactive-primary-hover: #D1B8A8;
+  --interactive-primary-active: #E3D4C9;
+  --interactive-secondary: #ADA095;
+  --interactive-secondary-hover: #C5BCB4;
+  --interactive-focus-ring: #ADA095;
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-theme="system"] {
+  --background-canvas: #131110;
+  --background-surface: #24201F;
+  --background-surface-raised: #3D3634;
+  --background-surface-sunken: #0D0B0A;
+  --text-primary: #F2ECE4;
+  --text-secondary: #D3C0A6;
+  --text-muted: #ADA095;
+  --text-on-accent: #1A1512;
+  --text-on-primary: #1A1512;
+  --border-default: #584F4B;
+  --border-subtle: #3D3634;
+  --border-strong: #796A5D;
+  --interactive-primary: #BE9B83;
+  --interactive-primary-hover: #D1B8A8;
+  --interactive-primary-active: #E3D4C9;
+  --interactive-secondary: #ADA095;
+  --interactive-secondary-hover: #C5BCB4;
+  --interactive-focus-ring: #ADA095;
+  }
+}
