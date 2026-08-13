@@ -18,6 +18,9 @@ export type LogModuleCode =
   | "KGQ-GH-CLIENT" // GitHub Client
   | "KGQ-GH-PROFILE" // GitHub Profile Fetcher
   | "KGQ-GH-REPOS" // GitHub Repositories Fetcher
+  | "KGQ-STORAGE-SETTINGS" // Storage Settings
+  | "KGQ-STORAGE-RATE-LIMIT" // Storage Rate Limit
+  | "KGQ-CACHE" // Cache Management
   | "KGQ-UI"; // Side Panel Dashboard UI
 
 export interface LogOptions {

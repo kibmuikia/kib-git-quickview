@@ -1,10 +1,7 @@
 // file: src/lib/github/repos.ts
 import { githubClient } from "./client.ts";
-import {
-  getSettings,
-  getCachedData,
-  setCachedData,
-} from "../../background/storage.ts";
+import { getSettings } from "../../lib/storage/settings.ts";
+import { getCachedData, setCachedData } from "../../lib/cache/cache.ts";
 import { logger } from "../logger.ts";
 import {
   GITHUB_API_BASE,
