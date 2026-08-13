@@ -15,6 +15,9 @@ export type LogModuleCode =
   | "KGQ-BG-GH" // Background Service Worker - GitHub Service
   | "KGQ-POP" // Popup UI
   | "KGQ-OPT" // Options Page
+  | "KGQ-GH-CLIENT" // GitHub Client
+  | "KGQ-GH-PROFILE" // GitHub Profile Fetcher
+  | "KGQ-GH-REPOS" // GitHub Repositories Fetcher
   | "KGQ-UI"; // Side Panel Dashboard UI
 
 export interface LogOptions {
