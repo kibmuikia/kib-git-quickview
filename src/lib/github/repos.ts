@@ -10,6 +10,7 @@ import {
   GITHUB_API_BASE,
   GitHubParseError,
   GitHubServiceError,
+  assertValidGithubUsername,
 } from "./types.ts";
 import type { GitHubRepository, RateLimitInfo } from "../../types/messages.ts";
 
@@ -23,6 +24,8 @@ export async function fetchUserRepos(
   const cleanUser = username.toLowerCase().trim().replace(/^@/, "");
   if (!cleanUser)
     throw new GitHubServiceError("A GitHub username is required.");
+
+  assertValidGithubUsername(cleanUser);
 
   const cacheKey = `repos_${cleanUser}_limit_${limit}`;
 
@@ -43,7 +46,7 @@ export async function fetchUserRepos(
   }
 
   const headers = await githubClient.getAuthHeaders();
-  const url = `${GITHUB_API_BASE}/users/${cleanUser}/repos?sort=updated&per_page=${limit}`;
+  const url = `${GITHUB_API_BASE}/users/${encodeURIComponent(cleanUser)}/repos?sort=updated&per_page=${limit}`;
   const res = await githubClient.fetchWithTimeout(url, headers);
 
   const rateLimit =
