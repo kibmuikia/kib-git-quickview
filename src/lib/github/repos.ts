@@ -8,8 +8,9 @@ import {
   GitHubParseError,
   GitHubServiceError,
   assertValidGithubUsername,
+  GitHubRepository,
 } from "./types.ts";
-import type { GitHubRepository, RateLimitInfo } from "../../types/messages.ts";
+import type { RateLimitInfo } from "../../types/messages.ts";
 
 const LOG_MODULE: import("../../lib/logger").LogModuleCode = "KGQ-GH-REPOS";
 
