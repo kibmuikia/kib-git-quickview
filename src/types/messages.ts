@@ -50,6 +50,7 @@ export type ExtensionMessageType =
   | 'GET_SETTINGS'
   | 'SAVE_SETTINGS'
   | 'CLEAR_CACHE'
+  | 'GET_CURRENT_TARGET'
   | 'PING'; // A discriminated union of message types : This is the string literal that acts as the discriminant — the tag TypeScript uses to narrow which shape you're dealing with.
 
 /* One interface per message, each with a type field matching one of those literals */
@@ -88,6 +89,14 @@ export interface ClearCacheMessage {
   type: 'CLEAR_CACHE';
 }
 
+/* Side-panel handoff — empty payload. The background stashes the most-recent
+   successful (profile, repos) pair from the popup's FETCH_USER_* messages
+   and returns them here. `username === null` means no popup search has
+   succeeded yet this worker lifetime. */
+export interface GetCurrentTargetMessage {
+  type: 'GET_CURRENT_TARGET';
+}
+
 export interface PingMessage {
   type: 'PING';
 }
@@ -99,6 +108,7 @@ export type ExtensionMessage =
   | GetSettingsMessage
   | SaveSettingsMessage
   | ClearCacheMessage
+  | GetCurrentTargetMessage
   | PingMessage; // The union that ties it together : This is the key type. Any valid message in your system is one of these seven shapes, and — critically — TypeScript can narrow based on `.type`.
 
 export interface ExtensionResponse<T = unknown> {
@@ -144,6 +154,16 @@ export interface ExtensionResponse<T = unknown> {
   That return true is the classic MV3 gotcha — Chrome closes the message channel immediately unless the listener returns true to signal "I'll call sendResponse asynchronously."
 */
 
+/* Bundled payload for GET_CURRENT_TARGET — the side-panel reads this to
+   render header / repos grid without re-fetching. `profile` and `repos`
+   are individually optional because a popup search that succeeded for
+   profile but failed for repos will leave us with only `profile` cached. */
+export interface CurrentTarget {
+  username: string | null;
+  profile?: GitHubUserProfile;
+  repos?: GitHubRepository[];
+}
+
 export interface MessageResponseMap {
   FETCH_USER_PROFILE: ExtensionResponse<GitHubUserProfile>;
   FETCH_USER_REPOS: ExtensionResponse<GitHubRepository[]>;
@@ -151,5 +171,6 @@ export interface MessageResponseMap {
   GET_SETTINGS: ExtensionResponse<ExtensionSettings>;
   SAVE_SETTINGS: ExtensionResponse<void>;
   CLEAR_CACHE: ExtensionResponse<void>;
+  GET_CURRENT_TARGET: ExtensionResponse<CurrentTarget>;
   PING: ExtensionResponse<string>;
 } // If you want end-to-end safety (send FetchProfileMessage, get back ExtensionResponse<GitHubUserProfile> inferred automatically), you'd build a mapped type linking each message type to its response type
