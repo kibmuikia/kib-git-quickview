@@ -5,7 +5,8 @@ export const GITHUB_API_BASE = "https://api.github.com";
 export const DEFAULT_TIMEOUT_MS = 10_000;
 export const GITHUB_USERNAME_RE = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 
-/* Types */
+/* Domain types — plain data shapes */
+
 export interface GitHubUserProfile {
   username: string;
   name: string;
@@ -18,7 +19,7 @@ export interface GitHubUserProfile {
   location?: string;
   blog?: string;
   htmlUrl: string;
-}
+} // Domain model used throughout UI components and background handlers.
 
 export interface GitHubRepository {
   id: number;
@@ -30,6 +31,43 @@ export interface GitHubRepository {
   forksCount: number;
   language: string | null;
   updatedAt: string;
+}
+
+// Raw REST API response shape for GET /users/{username}
+export interface GitHubUserResponse {
+  login: string;
+  id: number;
+  node_id: string;
+  avatar_url: string;
+  gravatar_id: string | null;
+  url: string;
+  html_url: string;
+  followers_url: string;
+  following_url: string;
+  gists_url: string;
+  starred_url: string;
+  subscriptions_url: string;
+  organizations_url: string;
+  repos_url: string;
+  events_url: string;
+  received_events_url: string;
+  type: string;
+  user_view_type?: string;
+  site_admin: boolean;
+  name: string | null;
+  company: string | null;
+  blog: string | null;
+  location: string | null;
+  email: string | null;
+  hireable: boolean | null;
+  bio: string | null;
+  twitter_username: string | null;
+  public_repos: number;
+  public_gists: number;
+  followers: number;
+  following: number;
+  created_at: string;
+  updated_at: string;
 }
 
 /* === */

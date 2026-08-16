@@ -8,9 +8,10 @@ import {
   GitHubParseError,
   GitHubServiceError,
   assertValidGithubUsername,
+  GitHubUserProfile,
+  GitHubUserResponse,
 } from "./types.ts";
 import type { RateLimitInfo } from "../../types/messages.ts";
-import type { GitHubUserProfile } from "./types.ts";
 
 const LOG_MODULE: import("../../lib/logger").LogModuleCode = "KGQ-GH-PROFILE";
 
@@ -104,4 +105,25 @@ export async function fetchUserProfile(
   }
 
   return { profile, rateLimit };
+}
+
+/**
+ * Maps raw GitHub REST API response payload to domain `GitHubUserProfile`.
+ */
+export function mapGitHubUserToProfile(
+  res: GitHubUserResponse,
+): GitHubUserProfile {
+  return {
+    username: res.login,
+    name: res.name ?? res.login,
+    avatarUrl: res.avatar_url,
+    bio: res.bio ?? "",
+    publicRepos: res.public_repos,
+    followers: res.followers,
+    following: res.following,
+    htmlUrl: res.html_url,
+    ...(res.company ? { company: res.company } : {}),
+    ...(res.location ? { location: res.location } : {}),
+    ...(res.blog ? { blog: res.blog } : {}),
+  };
 }
