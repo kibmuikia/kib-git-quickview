@@ -7,20 +7,44 @@
  */
 
 import type {
+  CurrentTarget,
   ExtensionMessage,
   ExtensionResponse,
+  GitHubRepository,
+  GitHubUserProfile,
   RateLimitInfo,
 } from "../types/messages.ts";
 import { githubService } from "./github-service.ts";
-import {
-  getSettings,
-  saveSettings,
-} from "../lib/storage/settings.ts";
+import { getSettings, saveSettings } from "../lib/storage/settings.ts";
 import { getRateLimit } from "../lib/storage/rate-limit.ts";
 import { clearCache } from "../lib/cache/cache.ts";
 import { logger } from "../lib/logger.ts";
 
 const LOG_MODULE = "KGQ-BG";
+
+// --- Side-Panel Handoff Cache ---
+// In-memory only (not persisted): the most-recent successful (profile, repos)
+// pair from the popup's FETCH_USER_* calls, so the side-panel can render
+// without re-fetching. Reset naturally on service-worker restart — that's
+// fine, GET_CURRENT_TARGET just reports `username: null` until the next
+// popup search succeeds.
+let currentTarget: CurrentTarget = { username: null };
+
+/**
+ * Merge a successful profile/repos fetch into the handoff cache. A change in
+ * username starts a fresh bundle instead of mixing data from two different
+ * users (e.g. profile for A lingering after repos for B come back).
+ */
+function stashCurrentTarget(
+  username: string,
+  partial: { profile?: GitHubUserProfile; repos?: GitHubRepository[] },
+): void {
+  if (currentTarget.username !== username) {
+    currentTarget = { username, ...partial };
+    return;
+  }
+  currentTarget = { ...currentTarget, ...partial };
+}
 
 // --- Initialization & Lifecycle Hooks ---
 
@@ -91,6 +115,7 @@ chrome.runtime.onMessage.addListener(
                 rateLimitData: rateLimit,
               },
             });
+            stashCurrentTarget(username, { profile });
             sendResponse({ success: true, data: profile, rateLimit });
           })
           .catch((err: Error) => {
@@ -125,6 +150,7 @@ chrome.runtime.onMessage.addListener(
                 rateLimitData: rateLimit,
               },
             });
+            stashCurrentTarget(username, { repos });
             sendResponse({ success: true, data: repos, rateLimit });
           })
           .catch((err: Error) => {
@@ -200,6 +226,15 @@ chrome.runtime.onMessage.addListener(
           });
 
         return true;
+      }
+
+      case "GET_CURRENT_TARGET": {
+        logger.debug("Serving cached handoff target to side panel", {
+          module: LOG_MODULE,
+          data: { username: currentTarget.username },
+        });
+        sendResponse({ success: true, data: currentTarget });
+        return false;
       }
 
       case "PING": {
