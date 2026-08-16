@@ -1,5 +1,9 @@
 /// <reference types="chrome" />
 // file: src/types/messages.ts
+import type {
+  GitHubUserProfile,
+  GitHubRepository,
+} from "../lib/github/types.ts";
 
 /* Domain types — plain data shapes */
 
@@ -13,32 +17,6 @@ export interface RateLimitInfo {
   limit: number;
   remaining: number;
   resetTime: number; // Unix timestamp in seconds
-}
-
-export interface GitHubUserProfile {
-  username: string;
-  name: string;
-  avatarUrl: string;
-  bio: string;
-  publicRepos: number;
-  followers: number;
-  following: number;
-  company?: string;
-  location?: string;
-  blog?: string;
-  htmlUrl: string;
-}
-
-export interface GitHubRepository {
-  id: number;
-  name: string;
-  fullName: string;
-  description: string | null;
-  htmlUrl: string;
-  stargazersCount: number;
-  forksCount: number;
-  language: string | null;
-  updatedAt: string;
 }
 
 /* --- Message Bus Payloads --- */

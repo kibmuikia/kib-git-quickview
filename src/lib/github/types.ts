@@ -5,6 +5,35 @@ export const GITHUB_API_BASE = "https://api.github.com";
 export const DEFAULT_TIMEOUT_MS = 10_000;
 export const GITHUB_USERNAME_RE = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 
+/* Types */
+export interface GitHubUserProfile {
+  username: string;
+  name: string;
+  avatarUrl: string;
+  bio: string;
+  publicRepos: number;
+  followers: number;
+  following: number;
+  company?: string;
+  location?: string;
+  blog?: string;
+  htmlUrl: string;
+}
+
+export interface GitHubRepository {
+  id: number;
+  name: string;
+  fullName: string;
+  description: string | null;
+  htmlUrl: string;
+  stargazersCount: number;
+  forksCount: number;
+  language: string | null;
+  updatedAt: string;
+}
+
+/* === */
+
 /* Typed errors
 - Every failure mode a caller might want to branch on (show a "not found" state vs. a "rate limited, retry at X" banner vs. a generic error toast)
     gets its own class instead of forcing callers to regex-match `.message`.
