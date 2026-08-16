@@ -11,6 +11,9 @@ import {
 import { LOGO_PNG_URL } from "../lib/constants";
 import { setLogo } from "../lib/utils";
 import { sendExtensionMessage } from "../lib/messaging";
+// import { logger } from "../lib/logger";
+
+// const LOG_MODULE: import("../lib/logger").LogModuleCode = "KGQ-OPT";
 
 export class OptionsController {
   private form = document.getElementById("settings-form") as HTMLFormElement;

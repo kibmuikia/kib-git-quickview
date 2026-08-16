@@ -11,7 +11,7 @@ import {
 } from "./types.ts";
 import type { GitHubUserProfile, RateLimitInfo } from "../../types/messages.ts";
 
-const LOG_MODULE = "KGQ-GH-PROFILE";
+const LOG_MODULE: import("../../lib/logger").LogModuleCode = "KGQ-GH-PROFILE";
 
 export async function fetchUserProfile(
   username: string,
@@ -32,6 +32,10 @@ export async function fetchUserProfile(
         cacheKey,
         settings.cacheTtlMinutes,
       );
+      logger.debug(`Cache lookup for '@${cleanUser}' returned:`, {
+        module: LOG_MODULE,
+        data: { cached },
+      });
       if (cached) return { profile: cached };
     } catch (err) {
       logger.warn(`Cache lookup failed for '@${cleanUser}'.`, {
@@ -46,6 +50,16 @@ export async function fetchUserProfile(
     `${GITHUB_API_BASE}/users/${encodeURIComponent(cleanUser)}`,
     headers,
   );
+  logger.debug(`Fetched user profile for '@${cleanUser}'`, {
+    module: LOG_MODULE,
+    data: {
+      headersSent: headers,
+      resStatus: res.status,
+      resStatusText: res.statusText,
+      resHeaders: Array.from(res.headers.entries()),
+      response: res,
+    },
+  });
   const rateLimit =
     githubClient.updateRateLimitFromHeaders(res.headers) ?? undefined;
 

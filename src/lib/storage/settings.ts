@@ -6,7 +6,7 @@ import { enqueueStorageMutation } from "./mutation-queue.ts";
 import { StorageWriteError } from "./errors.ts";
 import { logger } from "../logger.ts";
 
-const LOG_MODULE = "KGQ-STORAGE-SETTINGS";
+const LOG_MODULE: import("../../lib/logger").LogModuleCode = "KGQ-STORAGE-SETTINGS";
 export const SETTINGS_KEY = "KGQ_settings";
 
 export const DEFAULT_SETTINGS: ExtensionSettings = {

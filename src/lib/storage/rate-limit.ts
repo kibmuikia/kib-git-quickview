@@ -5,7 +5,7 @@ import type { RateLimitInfo } from "../../types/messages.ts";
 import { StorageWriteError } from "./errors.ts";
 import { logger } from "../logger.ts";
 
-const LOG_MODULE = "KGQ-STORAGE-RATE-LIMIT";
+const LOG_MODULE: import("../../lib/logger").LogModuleCode = "KGQ-STORAGE-RATE-LIMIT";
 export const RATE_LIMIT_KEY = "KGQ_rate_limit";
 
 export async function getRateLimit(): Promise<RateLimitInfo | null> {

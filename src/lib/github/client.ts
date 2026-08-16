@@ -14,7 +14,7 @@ import {
   GitHubTimeoutError,
 } from "./types.ts";
 
-const LOG_MODULE = "KGQ-GH-CLIENT";
+const LOG_MODULE: import("../../lib/logger").LogModuleCode = "KGQ-GH-CLIENT";
 
 export class GitHubClient {
   async getAuthHeaders(): Promise<HeadersInit> {
@@ -23,8 +23,9 @@ export class GitHubClient {
     };
     try {
       const settings = await getSettings();
-      if (settings.pat?.trim()) {
-        headers.Authorization = `Bearer ${settings.pat.trim()}`;
+      const pat = settings.pat?.trim();
+      if (pat) {
+        headers.Authorization = `Bearer ${pat}`;
       }
     } catch (err) {
       logger.warn("Failed to load settings; proceeding unauthenticated.", {
@@ -105,7 +106,18 @@ export class GitHubClient {
       const retryAfter = res.headers.get("retry-after");
       const resetHeader = res.headers.get("x-ratelimit-reset");
       const resetTime = resetHeader ? parseInt(resetHeader, 10) : undefined;
-
+      logger.warn("GitHub API rate limit or auth issue.", {
+        module: LOG_MODULE,
+        data: {
+          status: res.status,
+          rateHeaders: {
+            "x-ratelimit-remaining": remaining,
+            "retry-after": retryAfter,
+            "x-ratelimit-reset": resetHeader,
+          },
+          headers: Object.fromEntries(res.headers.entries()),
+        },
+      });
       if (retryAfter) {
         throw new GitHubRateLimitError(
           `GitHub is temporarily throttling requests. Retry after ${retryAfter}s.`,

@@ -20,7 +20,7 @@ import { getRateLimit } from "../lib/storage/rate-limit.ts";
 import { clearCache } from "../lib/cache/cache.ts";
 import { logger } from "../lib/logger.ts";
 
-const LOG_MODULE = "KGQ-BG";
+const LOG_MODULE: import("../lib/logger").LogModuleCode = "KGQ-BG";
 
 // --- Side-Panel Handoff Cache ---
 // In-memory only (not persisted): the most-recent successful (profile, repos)

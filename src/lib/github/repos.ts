@@ -11,7 +11,7 @@ import {
 } from "./types.ts";
 import type { GitHubRepository, RateLimitInfo } from "../../types/messages.ts";
 
-const LOG_MODULE = "KGQ-GH-REPOS";
+const LOG_MODULE: import("../../lib/logger").LogModuleCode = "KGQ-GH-REPOS";
 
 export async function fetchUserRepos(
   username: string,

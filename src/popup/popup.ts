@@ -4,12 +4,12 @@
 import "./popup.css";
 import { LOGO_PNG_URL } from "../lib/constants";
 import { setLogo } from "../lib/utils";
-import type {
-  GitHubUserProfile,
-  GitHubRepository,
-} from "../types/messages";
+import type { GitHubUserProfile, GitHubRepository } from "../types/messages";
 // import { logger } from "../lib/logger.ts";
 import { sendExtensionMessage } from "../lib/messaging";
+import { logger } from "../lib/logger";
+
+const LOG_MODULE: import("../lib/logger").LogModuleCode = "KGQ-POP";
 
 export type PopupState = "initial" | "loading" | "success" | "error";
 export type ThemeMode = "dark" | "light" | "system";
@@ -40,11 +40,18 @@ export class PopupController {
       const response = await sendExtensionMessage({
         type: "GET_SETTINGS",
       });
+      logger.debug("Fetched settings for theme initialization", {
+        module: LOG_MODULE,
+        data: { responseData: response.data },
+      });
       if (response.success && response.data?.theme) {
         this.setTheme(response.data.theme, { persist: false });
       }
     } catch {
       // Background worker unreachable (e.g. standalone preview) — keep default theme
+      logger.warn("Failed to fetch theme preference", {
+        module: LOG_MODULE,
+      });
       this.showToast("Error encountered while fetching theme preference");
     }
   }
@@ -73,10 +80,17 @@ export class PopupController {
 
   /* --- State Management --- */
   public setState(state: PopupState): void {
-    this.currentState = state;
-    const main = document.getElementById("main-content");
-    if (main) {
-      main.setAttribute("data-state", state);
+    try {
+      this.currentState = state;
+      const main = document.getElementById("main-content");
+      if (main) {
+        main.setAttribute("data-state", state);
+      }
+    } catch (err) {
+      logger.error("Failed to set popup state", {
+        module: LOG_MODULE,
+        data: { error: err, attemptedState: state },
+      });
     }
   }
 
@@ -115,6 +129,10 @@ export class PopupController {
         const response = await sendExtensionMessage({
           type: "FETCH_USER_PROFILE",
           payload: { username: cleanUsername },
+        });
+        logger.debug("FETCH_USER_PROFILE response", {
+          module: LOG_MODULE,
+          data: { responseData: response },
         });
 
         if (!response.success || !response.data) {
