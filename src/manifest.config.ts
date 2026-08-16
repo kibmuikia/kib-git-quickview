@@ -37,4 +37,7 @@ export default defineManifest(async () => ({
       128: "icons/icon128.png",
     },
   },
+  side_panel: {
+    default_path: "public/sidepanel.html",
+  },
 }));
