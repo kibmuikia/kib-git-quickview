@@ -1,0 +1,69 @@
+/* file: src/sidepanel/sidepanel.css */
+@import '../styles/tokens.generated.css';
+@import '../styles/components.css';
+
+/* -------------------------------------------------------------------------- */
+/* Side-panel-only tokens (none yet — everything comes from the shared theme */
+/* and components.css. Real sections land in Phase 2 onward.)               */
+/* -------------------------------------------------------------------------- */
+
+body {
+  background-color: var(--background-canvas);
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.4;
+  min-height: 100vh;
+}
+
+/* Chrome's side-panel surface is narrow (~320–480px) — let the container
+   own that width and let content stretch with internal padding. */
+.sidepanel-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+}
+
+.sp-app {
+  flex: 1;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* --- Placeholder shown until Phase 1.2 controller populates #sp-app --- */
+.sp-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  border: 1px dashed var(--border-subtle);
+  border-radius: 12px;
+  background: var(--surface-elevated);
+}
+
+.sp-placeholder-copy {
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+/* --- Toast placement (matches popup/options layout primitive) --- */
+.toast-container {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  z-index: 50;
+}
+
+.toast {
+  animation: toastSlideIn 0.2s ease, toastFadeOut 0.3s ease 2.2s forwards;
+}
+
+@keyframes toastFadeOut {
+  to { opacity: 0; transform: translateY(-6px); }
+}
