@@ -50,6 +50,39 @@ body {
   font-size: 12px;
 }
 
+/* --- Phase 1.6: handoff placeholder rows (username / name / repo count) --- */
+.sp-handoff {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+ 
+.sp-handoff-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+ 
+.sp-handoff-row dt {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+ 
+.sp-handoff-row dd {
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: right;
+}
+
 /* --- Toast placement (matches popup/options layout primitive) --- */
 .toast-container {
   position: absolute;

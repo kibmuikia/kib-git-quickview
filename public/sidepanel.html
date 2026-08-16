@@ -1,46 +1,81 @@
 <!-- file: public/sidepanel.html -->
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" data-theme="dark">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KibGitQuickView — Side Panel</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KibGitQuickView — Side Panel</title>
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
 
-  <link rel="stylesheet" href="../src/sidepanel/sidepanel.css" />
-</head>
-<body>
-  <div id="app" class="sidepanel-container">
+    <link rel="stylesheet" href="../src/sidepanel/sidepanel.css" />
+  </head>
+  <body>
+    <div id="app" class="sidepanel-container">
+      <!-- Toast Notification Container (shared primitive with popup/options) -->
+      <div
+        id="toast-container"
+        class="toast-container"
+        aria-live="polite"
+      ></div>
 
-    <!-- Toast Notification Container (shared primitive with popup/options) -->
-    <div id="toast-container" class="toast-container" aria-live="polite"></div>
-
-    <!-- Main Dynamic Content Area — controller will populate in Phase 1.2+ -->
-    <main id="sp-app" class="sp-app" data-state="initial">
-      <!-- Phase 1.1 placeholder; replaced by real sections from Phase 2 onward -->
-      <section class="sp-placeholder">
-        <div class="brand">
-          <div class="brand-logo" title="KibGitQuickView Logo">
-            <img id="logo-img" class="hidden" alt="KibGitQuickView Logo" width="22" height="22" />
-            <svg id="logo-svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="4 17 10 11 4 5"></polyline>
-              <line x1="12" y1="19" x2="20" y2="19"></line>
-            </svg>
+      <!-- Main Dynamic Content Area — controller will populate in Phase 1.2+ -->
+      <main id="sp-app" class="sp-app" data-state="initial">
+        <!-- Phase 1.1 placeholder; replaced by real sections from Phase 2 onward -->
+        <section class="sp-placeholder">
+          <div class="brand">
+            <div class="brand-logo" title="KibGitQuickView Logo">
+              <img
+                id="logo-img"
+                class="hidden"
+                alt="KibGitQuickView Logo"
+                width="22"
+                height="22"
+              />
+              <svg
+                id="logo-svg"
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="4 17 10 11 4 5"></polyline>
+                <line x1="12" y1="19" x2="20" y2="19"></line>
+              </svg>
+            </div>
+            <span class="brand-title">KibGitQuickView</span>
           </div>
-          <span class="brand-title">KibGitQuickView</span>
-        </div>
-        <p class="sp-placeholder-copy">
-          Side panel scaffolded. Awaiting popup handoff.
-        </p>
-      </section>
-    </main>
+          <p id="sp-status" class="sp-placeholder-copy">
+            Checking for a popup search…
+          </p>
+          <dl id="sp-handoff" class="sp-handoff hidden">
+            <div class="sp-handoff-row">
+              <dt>Username</dt>
+              <dd id="sp-handoff-username">—</dd>
+            </div>
+            <div class="sp-handoff-row">
+              <dt>Name</dt>
+              <dd id="sp-handoff-name">—</dd>
+            </div>
+            <div class="sp-handoff-row">
+              <dt>Repos fetched</dt>
+              <dd id="sp-handoff-repo-count">—</dd>
+            </div>
+          </dl>
+        </section>
+      </main>
+    </div>
 
-  </div>
-
-  <script type="module" src="../src/sidepanel/index.ts"></script>
-</body>
+    <script type="module" src="../src/sidepanel/index.ts"></script>
+  </body>
 </html>
