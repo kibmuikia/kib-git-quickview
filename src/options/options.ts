@@ -3,8 +3,6 @@ import "./options.css";
 import {
   ExtensionSettings,
   RateLimitInfo,
-  MessageResponseMap,
-  ExtensionMessage,
   GetSettingsMessage,
   SaveSettingsMessage,
   ClearCacheMessage,
@@ -12,6 +10,7 @@ import {
 } from "../types/messages";
 import { LOGO_PNG_URL } from "../lib/constants";
 import { setLogo } from "../lib/utils";
+import { sendExtensionMessage } from "../lib/messaging";
 
 export class OptionsController {
   private form = document.getElementById("settings-form") as HTMLFormElement;
@@ -45,35 +44,6 @@ export class OptionsController {
     this.loadSettings();
     this.loadRateLimit();
     this.setLogo();
-  }
-
-  /* private async sendMessage<T>(message: ExtensionMessage): Promise<T> {
-    return new Promise((resolve, reject) => {
-      chrome.runtime.sendMessage(message, (response) => {
-        if (chrome.runtime.lastError) {
-          reject(new Error(chrome.runtime.lastError.message));
-        } else {
-          resolve(response);
-        }
-      });
-    });
-  } */ // This method is commented out because it was replaced with a more type-safe version below.
-
-  private sendExtensionMessage<T extends ExtensionMessage>(
-    message: T,
-  ): Promise<MessageResponseMap[T["type"]]> {
-    return new Promise((resolve, reject) => {
-      chrome.runtime.sendMessage(
-        message,
-        (response: MessageResponseMap[T["type"]]) => {
-          if (chrome.runtime.lastError) {
-            reject(new Error(chrome.runtime.lastError.message));
-            return;
-          }
-          resolve(response);
-        },
-      );
-    });
   }
 
   private initNavigation(): void {
@@ -137,7 +107,7 @@ export class OptionsController {
 
   private async loadSettings(): Promise<void> {
     try {
-      const response = await this.sendExtensionMessage<GetSettingsMessage>({
+      const response = await sendExtensionMessage<GetSettingsMessage>({
         type: "GET_SETTINGS",
       });
       if (response.success && response.data) {
@@ -176,7 +146,7 @@ export class OptionsController {
     };
 
     try {
-      const response = await this.sendExtensionMessage<SaveSettingsMessage>({
+      const response = await sendExtensionMessage<SaveSettingsMessage>({
         type: "SAVE_SETTINGS",
         payload: updatedSettings,
       });
@@ -194,7 +164,7 @@ export class OptionsController {
 
   private async clearCache(): Promise<void> {
     try {
-      const response = await this.sendExtensionMessage<ClearCacheMessage>({
+      const response = await sendExtensionMessage<ClearCacheMessage>({
         type: "CLEAR_CACHE",
       });
       if (response.success) {
@@ -214,7 +184,7 @@ export class OptionsController {
 
   private async loadRateLimit(): Promise<void> {
     try {
-      const response = await this.sendExtensionMessage<GetRateLimitMessage>({
+      const response = await sendExtensionMessage<GetRateLimitMessage>({
         type: "GET_RATE_LIMIT",
       });
       if (response.success && response.data) {
