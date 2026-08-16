@@ -12,6 +12,7 @@ import {
   GitHubUserResponse,
 } from "./types.ts";
 import type { RateLimitInfo } from "../../types/messages.ts";
+import { assertValidGitHubUserResponse } from "./utils.ts";
 
 const LOG_MODULE: import("../../lib/logger").LogModuleCode = "KGQ-GH-PROFILE";
 
@@ -109,10 +110,11 @@ export async function fetchUserProfile(
 
 /**
  * Maps raw GitHub REST API response payload to domain `GitHubUserProfile`.
+ * Throws GitHubParseError on malformed input rather than a raw runtime error.
  */
-export function mapGitHubUserToProfile(
-  res: GitHubUserResponse,
-): GitHubUserProfile {
+export function mapGitHubUserToProfile(res: unknown): GitHubUserProfile {
+  assertValidGitHubUserResponse(res);
+
   return {
     username: res.login,
     name: res.name ?? res.login,
@@ -122,8 +124,8 @@ export function mapGitHubUserToProfile(
     followers: res.followers,
     following: res.following,
     htmlUrl: res.html_url,
-    ...(res.company ? { company: res.company } : {}),
-    ...(res.location ? { location: res.location } : {}),
-    ...(res.blog ? { blog: res.blog } : {}),
+    ...(typeof res.company === "string" && res.company ? { company: res.company } : {}),
+    ...(typeof res.location === "string" && res.location ? { location: res.location } : {}),
+    ...(typeof res.blog === "string" && res.blog ? { blog: res.blog } : {}),
   };
 }
