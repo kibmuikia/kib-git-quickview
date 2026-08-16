@@ -5,12 +5,11 @@ import "./popup.css";
 import { LOGO_PNG_URL } from "../lib/constants";
 import { setLogo } from "../lib/utils";
 import type {
-  ExtensionMessage,
-  MessageResponseMap,
   GitHubUserProfile,
   GitHubRepository,
 } from "../types/messages";
-import { logger } from "../lib/logger.ts";
+// import { logger } from "../lib/logger.ts";
+import { sendExtensionMessage } from "../lib/messaging";
 
 export type PopupState = "initial" | "loading" | "success" | "error";
 export type ThemeMode = "dark" | "light" | "system";
@@ -35,47 +34,34 @@ export class PopupController {
     this.setLogo();
   }
 
-  /* --- Extension Message Helper --- */
-  private sendExtensionMessage<T extends ExtensionMessage>(
-    message: T,
-  ): Promise<MessageResponseMap[T["type"]]> {
-    return new Promise((resolve, reject) => {
-      chrome.runtime.sendMessage(
-        message,
-        (response: MessageResponseMap[T["type"]]) => {
-          if (chrome.runtime.lastError) {
-            reject(new Error(chrome.runtime.lastError.message));
-            return;
-          }
-          resolve(response);
-        },
-      );
-    });
-  }
-
   /* --- Theme Management --- */
-  private initTheme(): void {
-    if (typeof chrome !== "undefined" && chrome.storage?.local) {
-      chrome.storage.local.get(["theme"], (result) => {
-        if (result.theme) {
-          this.setTheme(result.theme as ThemeMode);
-        }
+  private async initTheme(): Promise<void> {
+    try {
+      const response = await sendExtensionMessage({
+        type: "GET_SETTINGS",
       });
-    } else {
-      const saved = localStorage.getItem("kib_theme") as ThemeMode;
-      if (saved) this.setTheme(saved);
+      if (response.success && response.data?.theme) {
+        this.setTheme(response.data.theme, { persist: false });
+      }
+    } catch {
+      // Background worker unreachable (e.g. standalone preview) — keep default theme
+      this.showToast("Error encountered while fetching theme preference");
     }
   }
 
-  public setTheme(mode: ThemeMode): void {
+  public setTheme(mode: ThemeMode, opts: { persist?: boolean } = {}): void {
     this.currentTheme = mode;
     document.documentElement.setAttribute("data-theme", mode);
 
-    if (typeof chrome !== "undefined" && chrome.storage?.local) {
-      chrome.storage.local.set({ theme: mode });
-    } else {
-      localStorage.setItem("kib_theme", mode);
-    }
+    if (opts.persist === false) return;
+
+    sendExtensionMessage({
+      type: "SAVE_SETTINGS",
+      payload: { theme: mode },
+    }).catch(() => {
+      // Non-fatal: theme still applied to DOM this session, just not persisted
+      this.showToast("Couldn't save theme preference");
+    });
   }
 
   public toggleTheme(): void {
@@ -126,7 +112,7 @@ export class PopupController {
         typeof chrome !== "undefined" &&
         typeof chrome.runtime?.sendMessage === "function"
       ) {
-        const response = await this.sendExtensionMessage({
+        const response = await sendExtensionMessage({
           type: "FETCH_USER_PROFILE",
           payload: { username: cleanUsername },
         });
@@ -162,7 +148,7 @@ export class PopupController {
         typeof chrome.runtime?.sendMessage === "function"
       ) {
         try {
-          const repoResponse = await this.sendExtensionMessage({
+          const repoResponse = await sendExtensionMessage({
             type: "FETCH_USER_REPOS",
             payload: { username: cleanUsername, limit: 10 },
           });
