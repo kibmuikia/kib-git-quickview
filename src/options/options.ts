@@ -11,9 +11,9 @@ import {
 import { LOGO_PNG_URL } from "../lib/constants";
 import { setLogo } from "../lib/utils";
 import { sendExtensionMessage } from "../lib/messaging";
-// import { logger } from "../lib/logger";
+import { logger } from "../lib/logger";
 
-// const LOG_MODULE: import("../lib/logger").LogModuleCode = "KGQ-OPT";
+const LOG_MODULE: import("../lib/logger").LogModuleCode = "KGQ-OPT";
 
 export class OptionsController {
   private form = document.getElementById("settings-form") as HTMLFormElement;
@@ -27,6 +27,9 @@ export class OptionsController {
   private btnClearCache = document.getElementById(
     "btn-clear-cache",
   ) as HTMLButtonElement;
+  private mockModeToggle = document.getElementById(
+    "mock-mode-toggle",
+  ) as HTMLInputElement;
   private toastContainer = document.getElementById(
     "toast-container",
   ) as HTMLDivElement;
@@ -113,6 +116,10 @@ export class OptionsController {
       const response = await sendExtensionMessage<GetSettingsMessage>({
         type: "GET_SETTINGS",
       });
+      logger.debug("Loaded settings from background worker:", {
+        module: LOG_MODULE,
+        data: { response },
+      });
       if (response.success && response.data) {
         const settings = response.data;
         if (settings.pat) this.patInput.value = settings.pat;
@@ -123,6 +130,10 @@ export class OptionsController {
           `input[name="theme"][value="${themeToSelect}"]`,
         );
         if (radio) radio.checked = true;
+
+        if (settings.mockMode !== undefined) {
+          this.mockModeToggle.checked = settings.mockMode;
+        }
 
         this.applyThemeToDOM(themeToSelect);
       }
@@ -146,6 +157,7 @@ export class OptionsController {
       pat: this.patInput.value.trim() || undefined,
       theme: selectedTheme,
       cacheTtlMinutes: parseInt(this.cacheTtlInput.value, 10) || 60,
+      mockMode: this.mockModeToggle.checked,
     };
 
     try {

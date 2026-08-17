@@ -12,6 +12,7 @@ export const SETTINGS_KEY = "KGQ_settings";
 export const DEFAULT_SETTINGS: ExtensionSettings = {
   theme: "dark",
   cacheTtlMinutes: 15,
+  mockMode: false,
 };
 
 export async function getSettings(): Promise<ExtensionSettings> {

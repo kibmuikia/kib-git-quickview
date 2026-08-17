@@ -9,8 +9,9 @@ import type {
 
 export interface ExtensionSettings {
   pat?: string;
-  theme: 'dark' | 'light' | 'system';
+  theme: "dark" | "light" | "system";
   cacheTtlMinutes: number;
+  mockMode: boolean;
 }
 
 export interface RateLimitInfo {
