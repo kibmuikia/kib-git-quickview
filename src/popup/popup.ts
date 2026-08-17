@@ -27,53 +27,35 @@ export class PopupController {
   // private abortController: AbortController | null = null; // 'abortController' is declared but its value is never read.
 
   constructor() {
-    this.initTheme();
-    this.initModeIndicators();
+    this.initThemeAndModeIndicators();
     this.bindEvents();
     this.setState("initial");
     this.setLogo();
   }
 
-  /* --- Mode Indicators --- */
-  private initModeIndicators(): void {
-    // IS_DEV_MODE is a build-time constant (import.meta.env.DEV) — inlined
-    // here so the DEV chip only ships into dev bundles.
-    const devIndicator = document.getElementById("dev-mode-indicator");
-    if (devIndicator) {
-      devIndicator.hidden = !IS_DEV_MODE;
-    }
-
-    // settings.mockMode is a runtime preference; fetch via the message bus
-    // so we render the same state the background is going to honor.
-    void (async () => {
-      try {
-        const response = await sendExtensionMessage({ type: "GET_SETTINGS" });
-        const mockEnabled = Boolean(
-          response.success && response.data?.mockMode,
-        );
-        const mockIndicator = document.getElementById("mock-mode-indicator");
-        if (mockIndicator) mockIndicator.hidden = !mockEnabled;
-      } catch (err) {
-        logger.warn("Failed to load mock-mode preference for indicator", {
-          module: LOG_MODULE,
-          data: { error: err },
-        });
-      }
-    })();
-  }
-
-  /* --- Theme Management --- */
-  private async initTheme(): Promise<void> {
+  /* --- Theme Management + Mode Indicators --- */
+  private async initThemeAndModeIndicators(): Promise<void> {
     try {
+      // IS_DEV_MODE is a build-time constant (import.meta.env.DEV) — inlined here so the DEV chip only ships into dev bundles.
+      const devIndicator = document.getElementById("dev-mode-indicator");
+      if (devIndicator) {
+        devIndicator.hidden = !IS_DEV_MODE;
+      }
+
       const response = await sendExtensionMessage({
         type: "GET_SETTINGS",
       });
-      logger.debug("Fetched settings for theme initialization", {
+      logger.debug("Fetched settings for initialization tasks", {
         module: LOG_MODULE,
-        data: { responseData: response.data },
+        data: { responseValue: response },
       });
-      if (response.success && response.data?.theme) {
-        this.setTheme(response.data.theme, { persist: false });
+      if (response.success && response.data) {
+        const data = response.data;
+        if (data.theme) {
+          this.setTheme(data.theme, { persist: false });
+        }
+        const mockIndicator = document.getElementById("mock-mode-indicator");
+        if (mockIndicator) mockIndicator.hidden = !data.mockMode;
       }
     } catch {
       // Background worker unreachable (e.g. standalone preview) — keep default theme

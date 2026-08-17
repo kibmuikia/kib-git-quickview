@@ -1,7 +1,7 @@
 // file: src/lib/github/utils.ts
 
-// import { logger } from "../logger.ts";
-import { GitHubParseError, GitHubUserResponse } from "./types.ts";
+import { GitHubUserResponse } from "./types.ts";
+import { GitHubParseError } from "./error.ts";
 
 /**
  * Validates the shape of a raw GitHub user response before mapping.
