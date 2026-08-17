@@ -9,7 +9,6 @@ import {
   GitHubServiceError,
   assertValidGithubUsername,
   GitHubUserProfile,
-  GitHubUserResponse,
 } from "./types.ts";
 import type { RateLimitInfo } from "../../types/messages.ts";
 import { assertValidGitHubUserResponse } from "./utils.ts";
@@ -27,11 +26,16 @@ export async function fetchUserProfile(
 
   assertValidGithubUsername(cleanUser);
 
-  const cacheKey = `user_${cleanUser}`;
+  // Settings are needed both for the cache-TTL and to know whether this
+  // request will resolve to mock data — mock entries must be cached under
+  // a distinct key (independent of `cleanUser`) so they are never silently
+  // overwritten by a later real-API fetch for the same username.
+  const settings = await getSettings();
+  const useMock = settings.mockMode && IS_DEV_MODE;
+  const cacheKey = useMock ? `mock_user` : `user_${cleanUser}`;
 
   if (!forceRefresh) {
     try {
-      const settings = await getSettings();
       const cached = await getCachedData<GitHubUserProfile>(
         cacheKey,
         settings.cacheTtlMinutes,
@@ -53,15 +57,13 @@ export async function fetchUserProfile(
       });
     }
   }
-
-  const settings = await getSettings();
   const headers = await githubClient.getAuthHeaders();
   const link = `${GITHUB_API_BASE}/users/${encodeURIComponent(cleanUser)}`;
   const res = await githubClient.fetchWithTimeout(link, headers);
   const rateLimit =
     githubClient.updateRateLimitFromHeaders(res.headers) ?? undefined;
 
-  logger.debug(`Fetched user profile for '@${cleanUser}'`, {
+  logger.debug(`Fetched user profile for '@${useMock ? "mock-user" : cleanUser}'`, {
     module: LOG_MODULE,
     data: {
       linkUsed: link,
@@ -82,7 +84,7 @@ export async function fetchUserProfile(
   if (typeof raw.login !== "string") {
     throw new GitHubParseError(
       new Error(
-        `Malformed profile payload for '@${cleanUser}': missing 'login'.`,
+        `Malformed profile payload for '@${useMock ? "mock-user" : cleanUser}': missing 'login'.`,
       ),
     );
   }

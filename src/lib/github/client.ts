@@ -74,6 +74,7 @@ export class GitHubClient {
     timeoutMs = DEFAULT_TIMEOUT_MS,
   ): Promise<Response> {
     const settings = await getSettings();
+    
     if (settings.mockMode && IS_DEV_MODE) {
       const mockRes = await mockFetch(url);
       logger.debug(`Both mock-mode & dev-mode are true, fetching mock-data for, ${url}.`, {
@@ -81,6 +82,20 @@ export class GitHubClient {
         data: { mockResponse: mockRes },
       });
       return mockRes;
+    }
+
+    if (settings.mockMode && !IS_DEV_MODE) {
+      // Production build with mock-mode enabled — mock fixtures are stripped
+      // from non-dev bundles, so the request silently falls through to the
+      // real GitHub API. Surface this loudly so a misconfigured install is
+      // never mistaken for a working mock.
+      logger.warn(
+        "mockMode is enabled but this is a production build — mock-mode is not available in production. Falling back to a real network request.",
+        {
+          module: LOG_MODULE,
+          data: { url, mockMode: true, isDevMode: false },
+        },
+      );
     }
 
     const controller = new AbortController();

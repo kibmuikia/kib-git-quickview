@@ -3,6 +3,7 @@ import { githubClient } from "./client.ts";
 import { getSettings } from "../../lib/storage/settings.ts";
 import { getCachedData, setCachedData } from "../../lib/cache/cache.ts";
 import { logger } from "../logger.ts";
+import { IS_DEV_MODE } from "../constants.ts";
 import {
   GITHUB_API_BASE,
   GitHubParseError,
@@ -25,11 +26,15 @@ export async function fetchUserRepos(
 
   assertValidGithubUsername(cleanUser);
 
-  const cacheKey = `repos_${cleanUser}_limit_${limit}`;
+  // Mock-mode entries must be cached under a key that does not depend on
+  // `cleanUser`; otherwise a real-API fetch for the same username will
+  // silently overwrite the mock payload (or vice versa) in chrome.storage.
+  const settings = await getSettings();
+  const useMock = settings.mockMode && IS_DEV_MODE;
+  const cacheKey = useMock ? `mock_repos_limit_${limit}` : `repos_${cleanUser}_limit_${limit}`;
 
   if (!forceRefresh) {
     try {
-      const settings = await getSettings();
       const cached = await getCachedData<GitHubRepository[]>(
         cacheKey,
         settings.cacheTtlMinutes,

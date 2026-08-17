@@ -2,9 +2,9 @@
 // file: src/popup/popup.ts
 
 import "./popup.css";
-import { LOGO_PNG_URL } from "../lib/constants";
+import { IS_DEV_MODE, LOGO_PNG_URL } from "../lib/constants";
 import { setLogo } from "../lib/utils";
-import type { GitHubUserProfile, GitHubRepository } from "../types/messages";
+import type { GitHubUserProfile, GitHubRepository } from "../lib/github/types";
 // import { logger } from "../lib/logger.ts";
 import { sendExtensionMessage } from "../lib/messaging";
 import { logger } from "../lib/logger";
@@ -29,9 +29,38 @@ export class PopupController {
 
   constructor() {
     this.initTheme();
+    this.initModeIndicators();
     this.bindEvents();
     this.setState("initial");
     this.setLogo();
+  }
+
+  /* --- Mode Indicators --- */
+  private initModeIndicators(): void {
+    // IS_DEV_MODE is a build-time constant (import.meta.env.DEV) — inlined
+    // here so the DEV chip only ships into dev bundles.
+    const devIndicator = document.getElementById("dev-mode-indicator");
+    if (devIndicator) {
+      devIndicator.hidden = !IS_DEV_MODE;
+    }
+
+    // settings.mockMode is a runtime preference; fetch via the message bus
+    // so we render the same state the background is going to honor.
+    void (async () => {
+      try {
+        const response = await sendExtensionMessage({ type: "GET_SETTINGS" });
+        const mockEnabled = Boolean(
+          response.success && response.data?.mockMode,
+        );
+        const mockIndicator = document.getElementById("mock-mode-indicator");
+        if (mockIndicator) mockIndicator.hidden = !mockEnabled;
+      } catch (err) {
+        logger.warn("Failed to load mock-mode preference for indicator", {
+          module: LOG_MODULE,
+          data: { error: err },
+        });
+      }
+    })();
   }
 
   /* --- Theme Management --- */

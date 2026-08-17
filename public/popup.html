@@ -33,6 +33,29 @@
       </div>
 
       <div class="header-controls">
+        <!-- Mode indicators — hidden by default; toggled visible by
+             popup.ts based on the same booleans that gate the features
+             they advertise (settings.mockMode and IS_DEV_MODE). -->
+        <span
+          id="mock-mode-indicator"
+          class="mode-indicator mode-indicator--mock"
+          title="Mock mode is enabled"
+          hidden
+          aria-label="Mock mode enabled"
+        >
+          <span class="mode-indicator__label">MOCK</span>
+        </span>
+
+        <span
+          id="dev-mode-indicator"
+          class="mode-indicator mode-indicator--dev"
+          title="Development build"
+          hidden
+          aria-label="Development build"
+        >
+          <span class="mode-indicator__label">DEV</span>
+        </span>
+
         <!-- Theme Toggle Button -->
         <button id="theme-toggle" class="btn-icon" title="Toggle Theme">
           <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

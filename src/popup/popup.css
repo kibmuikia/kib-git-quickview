@@ -68,6 +68,51 @@ body {
   border-bottom: 1px solid var(--border-subtle);
 }
 
+/* --- Mode indicators (topbar chips for mockMode / IS_DEV_MODE) --- */
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mode-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 11px;
+  border: 1px solid transparent;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  line-height: 1;
+  user-select: none;
+}
+
+.mode-indicator[hidden] {
+  display: none;
+}
+
+.mode-indicator--mock {
+  background: var(--background-surface-raised);
+  color: var(--accent-rust);
+  border-color: var(--accent-rust);
+}
+
+.mode-indicator--dev {
+  background: var(--background-surface-raised);
+  color: var(--metal-bronze-400);
+  border-color: var(--metal-bronze-400);
+}
+
+.mode-indicator__label {
+  /* keep the label tight so the chip stays compact inside the 380px popup */
+  display: inline-block;
+}
+
 /* --- Main content switcher --- */
 .main-content {
   flex: 1;
