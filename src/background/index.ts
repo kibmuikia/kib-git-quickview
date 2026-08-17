@@ -10,8 +10,6 @@ import type {
   CurrentTarget,
   ExtensionMessage,
   ExtensionResponse,
-  GitHubRepository,
-  GitHubUserProfile,
   RateLimitInfo,
 } from "../types/messages.ts";
 import { githubService } from "./github-service.ts";
@@ -19,6 +17,10 @@ import { getSettings, saveSettings } from "../lib/storage/settings.ts";
 import { getRateLimit } from "../lib/storage/rate-limit.ts";
 import { clearCache } from "../lib/cache/cache.ts";
 import { logger } from "../lib/logger.ts";
+import type {
+  GitHubUserProfile,
+  GitHubRepository,
+} from "../lib/github/types.ts";
 
 const LOG_MODULE: import("../lib/logger").LogModuleCode = "KGQ-BG";
 
