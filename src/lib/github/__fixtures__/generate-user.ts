@@ -4,6 +4,7 @@
 import type { GitHubUserResponse } from "../types.ts";
 
 type UserArchetype = "individual" | "org" | "bot";
+type PoolType = "User" | "Organization" | "Bot";
 
 interface UserProfile {
   login: string;
@@ -16,7 +17,7 @@ interface UserProfile {
 
 interface ArchetypePool {
   profiles: UserProfile[];
-  type: "User" | "Organization" | "Bot";
+  type: PoolType;
 }
 
 // Seeded from real, well-known GitHub accounts for realistic distribution —
