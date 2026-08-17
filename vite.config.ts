@@ -1,5 +1,7 @@
-import { defineConfig } from "vite";
+// file: vite.config.ts
 import { crx } from "@crxjs/vite-plugin";
+import { defineConfig } from "vite";
+
 import manifest from "./src/manifest.config.ts";
 
 export default defineConfig({
