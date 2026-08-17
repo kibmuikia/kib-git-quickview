@@ -5,7 +5,6 @@ import "./popup.css";
 import { IS_DEV_MODE, LOGO_PNG_URL } from "../lib/constants";
 import { setLogo } from "../lib/utils";
 import type { GitHubUserProfile, GitHubRepository } from "../lib/github/types";
-// import { logger } from "../lib/logger.ts";
 import { sendExtensionMessage } from "../lib/messaging";
 import { logger } from "../lib/logger";
 
