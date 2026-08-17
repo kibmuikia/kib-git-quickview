@@ -3,8 +3,8 @@ import { getSettings } from "../../lib/storage/settings.ts";
 import { saveRateLimit } from "../../lib/storage/rate-limit.ts";
 import { logger } from "../logger.ts";
 import type { RateLimitInfo } from "../../types/messages.ts";
+import { DEFAULT_TIMEOUT_MS } from "./types.ts";
 import {
-  DEFAULT_TIMEOUT_MS,
   GitHubApiError,
   GitHubAuthError,
   GitHubNetworkError,
@@ -12,7 +12,8 @@ import {
   GitHubParseError,
   GitHubRateLimitError,
   GitHubTimeoutError,
-} from "./types.ts";
+  AbortMockModeActionError,
+} from "./error.ts";
 import { mockFetch } from "./mock-client.ts";
 import { IS_DEV_MODE } from "../constants.ts";
 
@@ -74,27 +75,31 @@ export class GitHubClient {
     timeoutMs = DEFAULT_TIMEOUT_MS,
   ): Promise<Response> {
     const settings = await getSettings();
-    
+
     if (settings.mockMode && IS_DEV_MODE) {
       const mockRes = await mockFetch(url);
-      logger.debug(`Both mock-mode & dev-mode are true, fetching mock-data for, ${url}.`, {
-        module: LOG_MODULE,
-        data: { mockResponse: mockRes },
-      });
+      logger.debug(
+        `Both mock-mode & dev-mode are true, fetching mock-data for, ${url}.`,
+        {
+          module: LOG_MODULE,
+          data: { mockResponse: mockRes },
+        },
+      );
       return mockRes;
     }
 
     if (settings.mockMode && !IS_DEV_MODE) {
       // Production build with mock-mode enabled — mock fixtures are stripped
-      // from non-dev bundles, so the request silently falls through to the
-      // real GitHub API. Surface this loudly so a misconfigured install is
-      // never mistaken for a working mock.
+      // from non-dev bundles.
       logger.warn(
-        "mockMode is enabled but this is a production build — mock-mode is not available in production. Falling back to a real network request.",
+        "mockMode is enabled but this is a production build — mock-mode is not available in production.",
         {
           module: LOG_MODULE,
           data: { url, mockMode: true, isDevMode: false },
         },
+      );
+      throw new AbortMockModeActionError(
+        "mockMode is enabled but this is a production build — mock-mode is not available in production.",
       );
     }
 

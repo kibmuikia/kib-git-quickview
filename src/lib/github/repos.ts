@@ -6,11 +6,10 @@ import { logger } from "../logger.ts";
 import { IS_DEV_MODE } from "../constants.ts";
 import {
   GITHUB_API_BASE,
-  GitHubParseError,
-  GitHubServiceError,
   assertValidGithubUsername,
   GitHubRepository,
 } from "./types.ts";
+import { GitHubParseError, GitHubServiceError } from "./error.ts";
 import type { RateLimitInfo } from "../../types/messages.ts";
 
 const LOG_MODULE: import("../../lib/logger").LogModuleCode = "KGQ-GH-REPOS";

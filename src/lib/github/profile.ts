@@ -5,11 +5,10 @@ import { getCachedData, setCachedData } from "../../lib/cache/cache.ts";
 import { logger } from "../logger.ts";
 import {
   GITHUB_API_BASE,
-  GitHubParseError,
-  GitHubServiceError,
   assertValidGithubUsername,
   GitHubUserProfile,
 } from "./types.ts";
+import { GitHubParseError, GitHubServiceError } from "./error.ts";
 import type { RateLimitInfo } from "../../types/messages.ts";
 import { assertValidGitHubUserResponse } from "./utils.ts";
 import { IS_DEV_MODE } from "../constants.ts";
