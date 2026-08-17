@@ -28,7 +28,9 @@
     "esbuild": "^0.28.2",
     "eslint": "^10.8.1",
     "typescript": "6.0.3",
-    "vite": "^8.2.1"
+    "vite": "^8.2.1",
+    "vitest": "^4.1.10",
+    "vitest-environment-web-ext": "^0.0.3"
   },
   "license": "MIT"
 }
