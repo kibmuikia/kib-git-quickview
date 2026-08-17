@@ -5,13 +5,17 @@ import type { GitHubUserResponse } from "../types.ts";
 
 type UserArchetype = "individual" | "org" | "bot";
 
+interface UserProfile {
+  login: string;
+  name: string | null;
+  company: string | null;
+  blog: string | null;
+  location: string | null;
+  bio: string | null;
+}
+
 interface ArchetypePool {
-  logins: string[];
-  names: (string | null)[];
-  companies: (string | null)[];
-  blogs: (string | null)[];
-  locations: (string | null)[];
-  bios: (string | null)[];
+  profiles: UserProfile[];
   type: "User" | "Organization" | "Bot";
 }
 
@@ -19,70 +23,130 @@ interface ArchetypePool {
 // not live data, just shape/value references.
 const POOLS: Record<UserArchetype, ArchetypePool> = {
   individual: {
-    logins: [
-      "torvalds",
-      "gaearon",
-      "sindresorhus",
-      "yyx990803",
-      "tj",
-      "addyosmani",
-    ],
-    names: ["Linus Torvalds", "Dan Abramov", "Sindre Sorhus", "Evan You", null, null],
-    companies: [
-      "Linux Foundation",
-      null,
-      "@sindresorhus",
-      "@voidzero-dev",
-      null,
-      null,
-    ],
-    blogs: [
-      "",
-      "https://overreacted.io",
-      "https://sindresorhus.com",
-      "https://evanyou.me",
-      null,
-      null,
-    ],
-    locations: ["Portland, OR", "London, UK", null, "Singapore", null, null],
-    bios: [
-      "Creator of Linux and Git",
-      null,
-      "Full-time open source",
-      "Creator of Vue.js",
-      null,
-      null,
+    profiles: [
+      {
+        login: "torvalds",
+        name: "Linus Torvalds",
+        company: "Linux Foundation",
+        blog: "",
+        location: "Portland, OR",
+        bio: "Creator of Linux and Git",
+      },
+      {
+        login: "gaearon",
+        name: "Dan Abramov",
+        company: null,
+        blog: "https://overreacted.io",
+        location: "London, UK",
+        bio: null,
+      },
+      {
+        login: "sindresorhus",
+        name: "Sindre Sorhus",
+        company: "@sindresorhus",
+        blog: "https://sindresorhus.com",
+        location: null,
+        bio: "Full-time open source",
+      },
+      {
+        login: "yyx990803",
+        name: "Evan You",
+        company: "@voidzero-dev",
+        blog: "https://evanyou.me",
+        location: "Singapore",
+        bio: "Creator of Vue.js",
+      },
+      {
+        login: "tj",
+        name: null,
+        company: null,
+        blog: null,
+        location: null,
+        bio: null,
+      },
+      {
+        login: "addyosmani",
+        name: null,
+        company: null,
+        blog: null,
+        location: null,
+        bio: null,
+      },
     ],
     type: "User",
   },
   org: {
-    logins: ["android", "facebook", "microsoft", "vercel", "openai"],
-    names: ["Android", "Meta", "Microsoft", "Vercel", "OpenAI"],
-    companies: [null, null, null, null, null],
-    blogs: [
-      "https://d.android.com",
-      "https://opensource.fb.com",
-      "https://opensource.microsoft.com",
-      "https://vercel.com",
-      "https://openai.com",
+    profiles: [
+      {
+        login: "android",
+        name: "Android",
+        company: null,
+        blog: "https://d.android.com",
+        location: null,
+        bio: null,
+      },
+      {
+        login: "facebook",
+        name: "Meta",
+        company: null,
+        blog: "https://opensource.fb.com",
+        location: "Menlo Park, CA",
+        bio: null,
+      },
+      {
+        login: "microsoft",
+        name: "Microsoft",
+        company: null,
+        blog: "https://opensource.microsoft.com",
+        location: "Redmond, WA",
+        bio: null,
+      },
+      {
+        login: "vercel",
+        name: "Vercel",
+        company: null,
+        blog: "https://vercel.com",
+        location: null,
+        bio: null,
+      },
+      {
+        login: "openai",
+        name: "OpenAI",
+        company: null,
+        blog: "https://openai.com",
+        location: "San Francisco, CA",
+        bio: null,
+      },
     ],
-    locations: [
-      null,
-      "Menlo Park, CA",
-      "Redmond, WA",
-      null,
-      "San Francisco, CA",
-    ],
-    bios: [null, null, null, null, null],
     type: "Organization",
   },
   bot: {
-    logins: ["dependabot", "github-actions", "renovate-bot"],
-    names: ["dependabot[bot]", "github-actions[bot]", "Renovate Bot"],
-    companies: [null, null, null],
-    blogs: [null, null, "https://renovatebot.com"],
-    locations: [null, null, null],
-    bios: [null, null, null],
+    profiles: [
+      {
+        login: "dependabot",
+        name: "dependabot[bot]",
+        company: null,
+        blog: null,
+        location: null,
+        bio: null,
+      },
+      {
+        login: "github-actions",
+        name: "github-actions[bot]",
+        company: null,
+        blog: null,
+        location: null,
+        bio: null,
+      },
+      {
+        login: "renovate-bot",
+        name: "Renovate Bot",
+        company: null,
+        blog: "https://renovatebot.com",
+        location: null,
+        bio: null,
+      },
+    ],
     type: "Bot",
   },
 };
@@ -119,8 +183,8 @@ export function generateGitHubUserResponse(
     options.archetype ?? pick(["individual", "org", "bot"] as UserArchetype[]);
   const pool = POOLS[archetype];
 
-  const idx = randomInt(0, pool.logins.length - 1);
-  const login = pool.logins[idx];
+  const profile = pick(pool.profiles);
+  const { login } = profile;
   const id = randomInt(100_000, 90_000_000);
   const createdAt = randomPastDate(1, 15);
 
@@ -144,13 +208,13 @@ export function generateGitHubUserResponse(
     type: pool.type === "Bot" ? "Bot" : pool.type,
     user_view_type: "public",
     site_admin: false,
-    name: pool.names[idx % pool.names.length],
-    company: pool.companies[idx % pool.companies.length],
-    blog: pool.blogs[idx % pool.blogs.length],
-    location: pool.locations[idx % pool.locations.length],
+    name: profile.name,
+    company: profile.company,
+    blog: profile.blog,
+    location: profile.location,
     email: null,
     hireable: archetype === "individual" ? pick([true, false, null]) : null,
-    bio: pool.bios[idx % pool.bios.length],
+    bio: profile.bio,
     twitter_username: archetype === "individual" ? pick([null, login]) : null,
     public_repos: archetype === "org" ? randomInt(20, 300) : randomInt(0, 400),
     public_gists: randomInt(0, 50),
