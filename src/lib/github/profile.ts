@@ -13,6 +13,7 @@ import {
 } from "./types.ts";
 import type { RateLimitInfo } from "../../types/messages.ts";
 import { assertValidGitHubUserResponse } from "./utils.ts";
+import { IS_DEV_MODE } from "../constants.ts";
 
 const LOG_MODULE: import("../../lib/logger").LogModuleCode = "KGQ-GH-PROFILE";
 
@@ -35,14 +36,16 @@ export async function fetchUserProfile(
         cacheKey,
         settings.cacheTtlMinutes,
       );
-      logger.debug(`Cache lookup for '@${cleanUser}' returned:`, {
-        module: LOG_MODULE,
-        data: { 
-          forceRefreshData: forceRefresh,
-          cacheData: cached,
-         },
-      });
-      if (cached) return { profile: cached };
+      if (cached) {
+        logger.debug(`Cache lookup for '@${cleanUser}' returned:`, {
+          module: LOG_MODULE,
+          data: {
+            forceRefreshData: forceRefresh,
+            cacheData: cached,
+          },
+        });
+        return { profile: cached };
+      }
     } catch (err) {
       logger.warn(`Cache lookup failed for '@${cleanUser}'.`, {
         module: LOG_MODULE,
@@ -51,17 +54,19 @@ export async function fetchUserProfile(
     }
   }
 
+  const settings = await getSettings();
   const headers = await githubClient.getAuthHeaders();
-  const res = await githubClient.fetchWithTimeout(
-    `${GITHUB_API_BASE}/users/${encodeURIComponent(cleanUser)}`,
-    headers,
-  );
+  const link = `${GITHUB_API_BASE}/users/${encodeURIComponent(cleanUser)}`;
+  const res = await githubClient.fetchWithTimeout(link, headers);
   const rateLimit =
     githubClient.updateRateLimitFromHeaders(res.headers) ?? undefined;
 
   logger.debug(`Fetched user profile for '@${cleanUser}'`, {
     module: LOG_MODULE,
     data: {
+      linkUsed: link,
+      mockMode: settings.mockMode,
+      isDevMode: IS_DEV_MODE,
       headersSent: headers,
       responseStatus: res.status,
       responseStatusText: res.statusText,
@@ -124,8 +129,12 @@ export function mapGitHubUserToProfile(res: unknown): GitHubUserProfile {
     followers: res.followers,
     following: res.following,
     htmlUrl: res.html_url,
-    ...(typeof res.company === "string" && res.company ? { company: res.company } : {}),
-    ...(typeof res.location === "string" && res.location ? { location: res.location } : {}),
+    ...(typeof res.company === "string" && res.company
+      ? { company: res.company }
+      : {}),
+    ...(typeof res.location === "string" && res.location
+      ? { location: res.location }
+      : {}),
     ...(typeof res.blog === "string" && res.blog ? { blog: res.blog } : {}),
   };
 }

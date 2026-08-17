@@ -13,7 +13,7 @@
     "isolatedModules": true,
     "moduleDetection": "force",
     "noEmit": true,
-    "types": ["chrome", "node"],
+    "types": ["chrome"],
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,

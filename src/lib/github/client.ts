@@ -14,6 +14,7 @@ import {
   GitHubTimeoutError,
 } from "./types.ts";
 import { mockFetch } from "./mock-client.ts";
+import { IS_DEV_MODE } from "../constants.ts";
 
 const LOG_MODULE: import("../../lib/logger").LogModuleCode = "KGQ-GH-CLIENT";
 
@@ -73,15 +74,12 @@ export class GitHubClient {
     timeoutMs = DEFAULT_TIMEOUT_MS,
   ): Promise<Response> {
     const settings = await getSettings();
-    if (settings.mockMode) {
-      const mockRes = mockFetch(url);
-      logger.debug(`Fetched mocked response `, {
-          module: LOG_MODULE,
-          data: {
-            mockMode: settings.mockMode,
-            mockResponse: mockRes,
-          },
-        });
+    if (settings.mockMode && IS_DEV_MODE) {
+      const mockRes = await mockFetch(url);
+      logger.debug(`Both mock-mode & dev-mode are true, fetching mock-data for, ${url}.`, {
+        module: LOG_MODULE,
+        data: { mockResponse: mockRes },
+      });
       return mockRes;
     }
 
