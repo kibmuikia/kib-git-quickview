@@ -13,6 +13,7 @@ import {
   GitHubRateLimitError,
   GitHubTimeoutError,
 } from "./types.ts";
+import { mockFetch } from "./mock-client.ts";
 
 const LOG_MODULE: import("../../lib/logger").LogModuleCode = "KGQ-GH-CLIENT";
 
@@ -71,6 +72,19 @@ export class GitHubClient {
     headers: HeadersInit,
     timeoutMs = DEFAULT_TIMEOUT_MS,
   ): Promise<Response> {
+    const settings = await getSettings();
+    if (settings.mockMode) {
+      const mockRes = mockFetch(url);
+      logger.debug(`Fetched mocked response `, {
+          module: LOG_MODULE,
+          data: {
+            mockMode: settings.mockMode,
+            mockResponse: mockRes,
+          },
+        });
+      return mockRes;
+    }
+
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {

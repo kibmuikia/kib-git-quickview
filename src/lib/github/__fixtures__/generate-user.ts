@@ -1,6 +1,7 @@
 // file: src/lib/github/__fixtures__/generate-user.ts
 // Dev/test-only generator for realistic GitHubUserResponse payloads.
 
+import { Buffer } from "buffer";
 import type { GitHubUserResponse } from "../types.ts";
 
 type UserArchetype = "individual" | "org" | "bot";

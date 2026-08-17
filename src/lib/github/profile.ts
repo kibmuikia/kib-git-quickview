@@ -37,7 +37,10 @@ export async function fetchUserProfile(
       );
       logger.debug(`Cache lookup for '@${cleanUser}' returned:`, {
         module: LOG_MODULE,
-        data: { cached },
+        data: { 
+          forceRefreshData: forceRefresh,
+          cacheData: cached,
+         },
       });
       if (cached) return { profile: cached };
     } catch (err) {
@@ -53,18 +56,20 @@ export async function fetchUserProfile(
     `${GITHUB_API_BASE}/users/${encodeURIComponent(cleanUser)}`,
     headers,
   );
+  const rateLimit =
+    githubClient.updateRateLimitFromHeaders(res.headers) ?? undefined;
+
   logger.debug(`Fetched user profile for '@${cleanUser}'`, {
     module: LOG_MODULE,
     data: {
       headersSent: headers,
-      resStatus: res.status,
-      resStatusText: res.statusText,
-      resHeaders: Array.from(res.headers.entries()),
+      responseStatus: res.status,
+      responseStatusText: res.statusText,
+      rateLimitData: rateLimit,
+      responseHeaders: Array.from(res.headers.entries()),
       response: res,
     },
   });
-  const rateLimit =
-    githubClient.updateRateLimitFromHeaders(res.headers) ?? undefined;
 
   await githubClient.assertOk(res, cleanUser);
   const raw = await githubClient.parseJson<Record<string, unknown>>(res);
@@ -76,11 +81,6 @@ export async function fetchUserProfile(
       ),
     );
   }
-
-  logger.debug(`Fetched user profile for '@${cleanUser}'`, {
-    module: LOG_MODULE,
-    data: { status: res.status, rateLimit },
-  });
 
   const profile: GitHubUserProfile = {
     username: raw.login,
