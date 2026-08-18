@@ -669,3 +669,27 @@ body {
   color: var(--text-on-accent);
   font-weight: 600;
 }
+
+/* --- Mock flow picker --- */
+.mock-flow-picker {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mock-flow-notice {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.mock-flow-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.mock-flow-btn {
+  height: 38px;
+}

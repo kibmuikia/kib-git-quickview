@@ -5,6 +5,7 @@ import type { ExtensionSettings } from "../../types/messages.ts";
 import { enqueueStorageMutation } from "./mutation-queue.ts";
 import { StorageWriteError } from "./errors.ts";
 import { logger } from "../logger.ts";
+import { IS_DEV_MODE } from "../constants.ts";
 
 const LOG_MODULE: import("../../lib/logger").LogModuleCode = "KGQ-STORAGE-SETTINGS";
 export const SETTINGS_KEY = "KGQ_settings";
@@ -14,6 +15,15 @@ export const DEFAULT_SETTINGS: ExtensionSettings = {
   cacheTtlMinutes: 15,
   mockMode: false,
 };
+
+/**
+ * Mock mode is only ever "live" when BOTH the runtime toggle and the build-time
+ * dev flag are true. Every call site (background client, popup, options) must
+ * go through this instead of checking settings.mockMode alone.
+ */
+export function isMockModeActive(settings: Pick<ExtensionSettings, "mockMode">): boolean {
+  return Boolean(settings.mockMode) && IS_DEV_MODE;
+}
 
 export async function getSettings(): Promise<ExtensionSettings> {
   try {

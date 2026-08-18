@@ -1,6 +1,6 @@
 // file: src/lib/github/profile.ts
 import { githubClient } from "./client.ts";
-import { getSettings } from "../../lib/storage/settings.ts";
+import { getSettings, isMockModeActive } from "../../lib/storage/settings.ts";
 import { getCachedData, setCachedData } from "../../lib/cache/cache.ts";
 import { logger } from "../logger.ts";
 import {
@@ -30,8 +30,9 @@ export async function fetchUserProfile(
   // a distinct key (independent of `cleanUser`) so they are never silently
   // overwritten by a later real-API fetch for the same username.
   const settings = await getSettings();
-  const useMock = settings.mockMode && IS_DEV_MODE;
-  const cacheKey = useMock ? `mock_user` : `user_${cleanUser}`;
+  const useMock = isMockModeActive(settings);
+  const cacheKey = useMock ? `mock_user_${cleanUser}` : `user_${cleanUser}`;
+  const logLabel = useMock ? `[mock_${cleanUser}]` : `@${cleanUser}`;
 
   if (!forceRefresh) {
     try {
@@ -40,7 +41,7 @@ export async function fetchUserProfile(
         settings.cacheTtlMinutes,
       );
       if (cached) {
-        logger.debug(`Cache lookup for '@${cleanUser}' returned:`, {
+        logger.debug(`Cache lookup for '${logLabel}' returned:`, {
           module: LOG_MODULE,
           data: {
             forceRefreshData: forceRefresh,
@@ -50,7 +51,7 @@ export async function fetchUserProfile(
         return { profile: cached };
       }
     } catch (err) {
-      logger.warn(`Cache lookup failed for '@${cleanUser}'.`, {
+      logger.warn(`Cache lookup failed for '${logLabel}'.`, {
         module: LOG_MODULE,
         data: { error: err },
       });
@@ -62,7 +63,7 @@ export async function fetchUserProfile(
   const rateLimit =
     githubClient.updateRateLimitFromHeaders(res.headers) ?? undefined;
 
-  logger.debug(`Fetched user profile for '@${useMock ? "mock-user" : cleanUser}'`, {
+  logger.debug(`Fetched user profile for '${logLabel}'`, {
     module: LOG_MODULE,
     data: {
       linkUsed: link,
@@ -83,7 +84,7 @@ export async function fetchUserProfile(
   if (typeof raw.login !== "string") {
     throw new GitHubParseError(
       new Error(
-        `Malformed profile payload for '@${useMock ? "mock-user" : cleanUser}': missing 'login'.`,
+        `Malformed profile payload for '${logLabel}': missing 'login'.`,
       ),
     );
   }
@@ -105,7 +106,7 @@ export async function fetchUserProfile(
   try {
     await setCachedData(cacheKey, profile);
   } catch (err) {
-    logger.warn(`Failed to cache profile for '@${cleanUser}'.`, {
+    logger.warn(`Failed to cache profile for '${logLabel}'.`, {
       module: LOG_MODULE,
       data: { error: err },
     });

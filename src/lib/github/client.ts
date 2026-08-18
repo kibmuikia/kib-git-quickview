@@ -1,5 +1,5 @@
 // file: src/lib/github/client.ts
-import { getSettings } from "../../lib/storage/settings.ts";
+import { getSettings, isMockModeActive } from "../../lib/storage/settings.ts";
 import { saveRateLimit } from "../../lib/storage/rate-limit.ts";
 import { logger } from "../logger.ts";
 import type { RateLimitInfo } from "../../types/messages.ts";
@@ -76,10 +76,10 @@ export class GitHubClient {
   ): Promise<Response> {
     const settings = await getSettings();
 
-    if (settings.mockMode && IS_DEV_MODE) {
+    if (isMockModeActive(settings)) {
       const mockRes = await mockFetch(url);
       logger.debug(
-        `Both mock-mode & dev-mode are true, fetching mock-data for, ${url}.`,
+        `Fetching mock-data for, ${url}.`,
         {
           module: LOG_MODULE,
           data: { mockResponse: mockRes },
@@ -88,7 +88,7 @@ export class GitHubClient {
       return mockRes;
     }
 
-    if (settings.mockMode && !IS_DEV_MODE) {
+    if (settings.mockMode && !isMockModeActive(settings)) {
       // Production build with mock-mode enabled — mock fixtures are stripped
       // from non-dev bundles.
       logger.warn(

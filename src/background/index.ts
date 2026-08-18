@@ -89,12 +89,13 @@ chrome.runtime.onMessage.addListener(
     _sender: chrome.runtime.MessageSender,
     sendResponse: (response: ExtensionResponse) => void,
   ): boolean => {
-    logger.debug("Received message: ", { module: LOG_MODULE, data: message });
     if (!message || typeof message !== "object") {
       sendResponse({ success: false, error: "Invalid message payload" });
       return false;
     }
-
+    logger.debug(`Received [ ${message.type} ]message.`, {
+      module: LOG_MODULE,
+    });
     switch (message.type) {
       case "FETCH_USER_PROFILE": {
         const { username, forceRefresh } = message.payload || {};

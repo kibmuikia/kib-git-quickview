@@ -45,18 +45,37 @@ export class PopupController {
       const response = await sendExtensionMessage({
         type: "GET_SETTINGS",
       });
+
       logger.debug("Fetched settings for initialization tasks", {
         module: LOG_MODULE,
-        data: { responseValue: response },
+        data: {
+          isDevMode: IS_DEV_MODE,
+          resSuccess: response.success,
+          resData: response.data,
+        },
       });
-      if (response.success && response.data) {
-        const data = response.data;
+
+      if (!response.success) {
+        throw new Error(
+          response.error
+            ? response.error
+            : `Error encountered while fetching settings`,
+        );
+      }
+
+      const data = response.data;
+      if (data) {
         if (data.theme) {
           this.setTheme(data.theme, { persist: false });
         }
-        this.currentMockMode = Boolean(data.mockMode);
+
+        // Effective mock mode requires BOTH the runtime toggle and the dev build flag.
+        this.currentMockMode = Boolean(data.mockMode) && IS_DEV_MODE;
+
         const mockIndicator = document.getElementById("mock-mode-indicator");
         if (mockIndicator) mockIndicator.hidden = !data.mockMode;
+
+        this.applyMockModeUI();
       }
     } catch {
       // Background worker unreachable (e.g. standalone preview) — keep default theme
@@ -110,8 +129,25 @@ export class PopupController {
     setLogo(LOGO_PNG_URL);
   }
 
+  private applyMockModeUI(): void {
+    const isMock = this.currentMockMode;
+
+    document
+      .getElementById("search-form-initial")
+      ?.classList.toggle("hidden", isMock);
+
+    document.querySelector(".try-prompt")?.classList.toggle("hidden", isMock);
+
+    document
+      .getElementById("mock-flow-picker")
+      ?.classList.toggle("hidden", !isMock);
+  }
+
   /* --- Search Trigger --- */
-  public async handleSearch(username: string): Promise<void> {
+  public async handleSearch(
+    username: string,
+    opts: { isMockFlow?: boolean } = {},
+  ): Promise<void> {
     const cleanUsername = username.trim().replace(/^@/, "");
 
     // Empty submit handling
@@ -125,7 +161,7 @@ export class PopupController {
 
     // Transition to LOADING state
     this.setState("loading");
-    this.updateLoadingUI(this.currentUsername);
+    this.updateLoadingUI(this.currentUsername, opts.isMockFlow ?? false);
 
     try {
       // 1. Fetch User Profile
@@ -197,12 +233,16 @@ export class PopupController {
     }
   }
 
-  private updateLoadingUI(username: string): void {
+  private updateLoadingUI(username: string, isMockFlow = false): void {
     const usernameEl = document.getElementById("loading-username");
     if (usernameEl) {
-      usernameEl.textContent = `@${username}`;
+      usernameEl.textContent = isMockFlow ? "TEST FLOW" : `@${username}`;
     }
-    this.updateTerminalLog("> Initializing sensor array...");
+    this.updateTerminalLog(
+      isMockFlow
+        ? "> Running mock fixture pipeline..."
+        : "> Initializing sensor array...",
+    );
   }
 
   private updateTerminalLog(text: string): void {
@@ -436,6 +476,15 @@ export class PopupController {
       ) as HTMLInputElement;
       this.handleSearch(input?.value || "");
     });
+
+    document
+      .querySelectorAll<HTMLButtonElement>(".mock-flow-btn")
+      .forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const scenario = btn.dataset.mockScenario || "mockuser";
+          this.handleSearch(scenario, { isMockFlow: true });
+        });
+      });
 
     // Error Search Form
     const errorForm = document.getElementById(

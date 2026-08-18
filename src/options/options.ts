@@ -8,7 +8,7 @@ import {
   ClearCacheMessage,
   GetRateLimitMessage,
 } from "../types/messages";
-import { LOGO_PNG_URL } from "../lib/constants";
+import { LOGO_PNG_URL, IS_DEV_MODE } from "../lib/constants";
 import { setLogo } from "../lib/utils";
 import { sendExtensionMessage } from "../lib/messaging";
 import { logger } from "../lib/logger";
@@ -118,7 +118,11 @@ export class OptionsController {
       });
       logger.debug("Loaded settings from background worker:", {
         module: LOG_MODULE,
-        data: { response },
+        data: {
+          isDevMode: IS_DEV_MODE,
+          resSuccess: response.success,
+          resData: response.data,
+        },
       });
       if (response.success && response.data) {
         const settings = response.data;
