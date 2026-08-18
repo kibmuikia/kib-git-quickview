@@ -78,13 +78,10 @@ export class GitHubClient {
 
     if (isMockModeActive(settings)) {
       const mockRes = await mockFetch(url);
-      logger.debug(
-        `Fetching mock-data for, ${url}.`,
-        {
-          module: LOG_MODULE,
-          data: { mockResponse: mockRes },
-        },
-      );
+      logger.debug(`Fetching mock-data for, ${url}.`, {
+        module: LOG_MODULE,
+        data: { mockResValue: mockRes },
+      });
       return mockRes;
     }
 
