@@ -140,7 +140,7 @@ body {
 
 /* --- Card layout (visuals come from shared .initial-card etc. in components.css) --- */
 .initial-card, .loading-card, .summary-card, .error-card {
-  padding: 24px 20px;
+  padding: 16px 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -149,8 +149,8 @@ body {
 
 /* --- 1. INITIAL STATE --- */
 .icon-box-large {
-  width: 64px;
-  height: 64px;
+  width: 44px;
+  height: 44px;
   background: var(--background-surface-raised);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);

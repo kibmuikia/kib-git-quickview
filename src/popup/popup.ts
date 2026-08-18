@@ -24,7 +24,7 @@ export class PopupController {
   private currentState: PopupState = "initial";
   private currentTheme: ThemeMode = "dark";
   private currentUsername: string = "";
-  // private abortController: AbortController | null = null; // 'abortController' is declared but its value is never read.
+  private currentMockMode: boolean = false;
 
   constructor() {
     this.initThemeAndModeIndicators();
@@ -54,6 +54,7 @@ export class PopupController {
         if (data.theme) {
           this.setTheme(data.theme, { persist: false });
         }
+        this.currentMockMode = Boolean(data.mockMode);
         const mockIndicator = document.getElementById("mock-mode-indicator");
         if (mockIndicator) mockIndicator.hidden = !data.mockMode;
       }
@@ -84,7 +85,7 @@ export class PopupController {
   public toggleTheme(): void {
     const nextMode: ThemeMode =
       this.currentTheme === "light" ? "dark" : "light";
-    this.setTheme(nextMode);
+    this.setTheme(nextMode, { persist: true });
     this.showToast(`Theme switched to: ${nextMode.toUpperCase()}`);
   }
 

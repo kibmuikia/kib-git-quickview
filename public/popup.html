@@ -83,7 +83,7 @@
       <section id="view-initial" class="view-panel view-initial">
         <div class="initial-card">
           <div class="icon-box-large">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
               <circle cx="12" cy="7" r="4"></circle>
               <circle cx="17" cy="17" r="3"></circle>
@@ -91,9 +91,9 @@
             </svg>
           </div>
 
-          <h1 class="hero-title">See a GitHub profile at a glance.</h1>
+          <h1 class="hero-title">Quick developer snapshots.</h1>
           <p class="hero-subtitle">
-            Enter a GitHub username to quickly view repositories, commit activity, and language usage in a clean, focused dashboard.
+            Your GitHub lookup, minus the tab switching.
           </p>
 
           <form id="search-form-initial" class="search-form-group">
@@ -111,6 +111,7 @@
                 aria-label="GitHub username input"
               />
             </div>
+            <!-- TODO: adapt if 'settings.mockMode' & 'IS_DEV_MODE' are both true; mock-mode is on, otherwise it is off. if on, sumbit should have text like, 'Mock flow'/'Test Flow'. -->
             <div id="search-error-cue" class="input-error-cue" hidden>Please enter a valid GitHub username</div>
             <button type="submit" class="btn-primary-rust">
               SEARCH &rarr;
