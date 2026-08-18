@@ -4,7 +4,7 @@
 import "./popup.css";
 import { IS_DEV_MODE, LOGO_PNG_URL } from "../lib/constants";
 import { setLogo } from "../lib/utils";
-import type { GitHubUserProfile, GitHubRepository } from "../lib/github/types";
+import { type GitHubUserProfile, type GitHubRepository, type MockUser, isMockUser } from "../lib/github/types";
 import { sendExtensionMessage } from "../lib/messaging";
 import { logger } from "../lib/logger";
 
@@ -158,10 +158,11 @@ export class PopupController {
 
     this.hideInputErrorCue();
     this.currentUsername = cleanUsername;
+    const isMockFlow = opts.isMockFlow ?? false;
 
     // Transition to LOADING state
     this.setState("loading");
-    this.updateLoadingUI(this.currentUsername, opts.isMockFlow ?? false);
+    this.updateLoadingUI(this.currentUsername, isMockFlow);
 
     try {
       // 1. Fetch User Profile
@@ -175,7 +176,7 @@ export class PopupController {
       ) {
         const response = await sendExtensionMessage({
           type: "FETCH_USER_PROFILE",
-          payload: { username: cleanUsername },
+          payload: { username: cleanUsername, viaMockBtn: isMockFlow },
         });
         logger.debug("FETCH_USER_PROFILE response", {
           module: LOG_MODULE,
@@ -481,7 +482,10 @@ export class PopupController {
       .querySelectorAll<HTMLButtonElement>(".mock-flow-btn")
       .forEach((btn) => {
         btn.addEventListener("click", () => {
-          const scenario = btn.dataset.mockScenario || "mockuser";
+          const rawScenario = btn.dataset.mockScenario;
+          const scenario: MockUser = isMockUser(rawScenario)
+            ? rawScenario
+            : "mockuser";
           this.handleSearch(scenario, { isMockFlow: true });
         });
       });

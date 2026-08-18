@@ -7,6 +7,21 @@ export const GITHUB_API_BASE = "https://api.github.com";
 export const DEFAULT_TIMEOUT_MS = 10_000;
 export const GITHUB_USERNAME_RE = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 
+export const MOCK_USERS = [
+  "mockuser",
+  "mock404",
+  "mockratelimit",
+  "mockabuse",
+] as const;
+
+export type MockUser = (typeof MOCK_USERS)[number];
+
+export function isMockUser(val: unknown): val is MockUser {
+  return (
+    typeof val === "string" && (MOCK_USERS as readonly string[]).includes(val)
+  );
+}
+
 /* Domain types — plain data shapes */
 
 export interface GitHubUserProfile {
